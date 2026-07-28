@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 export const metadata: Metadata = {
   title: "Gorib manush | Personal Finance Companion",
   description:
-    "A calm, intelligent expense tracker that helps you understand your money, spend safely, and reach payday without stress."
+    "A calm, intelligent expense tracker that helps you understand your money, spend safely, and reach payday without stress.",
 }
 
 export const viewport: Viewport = {
