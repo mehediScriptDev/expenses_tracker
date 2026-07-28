@@ -14,47 +14,34 @@ interface ThemeContextValue {
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null)
 
-function applyTheme(theme: Theme) {
-  const root = document.documentElement
-  const system = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light"
-  const resolved = theme === "system" ? system : theme
-  root.classList.remove("light", "dark")
-  root.classList.add(resolved)
-  return resolved
+function applyTheme(_t?: Theme) {
+  if (typeof window !== "undefined") {
+    const root = document.documentElement
+    root.classList.remove("dark")
+    root.classList.add("light")
+  }
+  return "light" as const
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("system")
-  const [resolved, setResolved] = React.useState<"light" | "dark">("dark")
+  const [theme, setThemeState] = React.useState<Theme>("light")
+  const [resolved, setResolved] = React.useState<"light" | "dark">("light")
 
   React.useEffect(() => {
-    const stored = (window.localStorage.getItem(THEME_KEY) as Theme) || "system"
-    setThemeState(stored)
-    setResolved(applyTheme(stored))
-  }, [])
-
-  React.useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)")
-    const handler = () => {
-      if ((window.localStorage.getItem(THEME_KEY) as Theme) === "system") {
-        setResolved(applyTheme("system"))
-      }
-    }
-    mq.addEventListener("change", handler)
-    return () => mq.removeEventListener("change", handler)
+    window.localStorage.setItem(THEME_KEY, "light")
+    setThemeState("light")
+    setResolved(applyTheme("light"))
   }, [])
 
   const setTheme = React.useCallback((t: Theme) => {
-    window.localStorage.setItem(THEME_KEY, t)
-    setThemeState(t)
-    setResolved(applyTheme(t))
+    window.localStorage.setItem(THEME_KEY, "light")
+    setThemeState("light")
+    setResolved(applyTheme("light"))
   }, [])
 
   const toggle = React.useCallback(() => {
-    setTheme(resolved === "dark" ? "light" : "dark")
-  }, [resolved, setTheme])
+    setTheme("light")
+  }, [setTheme])
 
   const value = React.useMemo(
     () => ({ theme, resolved, setTheme, toggle }),

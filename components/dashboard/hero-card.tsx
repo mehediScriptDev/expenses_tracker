@@ -59,7 +59,7 @@ export function HeroCard() {
         </div>
 
         {/* Right: balance card */}
-        <div className="rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-muted p-5 min-w-[240px] space-y-4">
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-muted p-5 min-w-60 space-y-4">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-muted-foreground">
               Available Balance

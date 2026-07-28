@@ -150,7 +150,7 @@ export function QuickAddBar() {
   }
 
   return (
-    <Card className="border-border/70 shadow-none bg-gradient-to-r from-card via-background to-card">
+    <Card className="border-border/70 shadow-none bg-linear-to-r from-card via-background to-card">
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold flex items-center gap-1.5 text-muted-foreground">

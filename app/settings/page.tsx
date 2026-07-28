@@ -191,35 +191,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Appearance & Theme Card */}
-        <Card className="border-border/60 shadow-none">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Appearance & Theme</CardTitle>
-            <CardDescription>Select dark, light, or system appearance modes.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: "Light", value: "light", icon: "sun" },
-                { label: "Dark", value: "dark", icon: "moon" },
-                { label: "System", value: "system", icon: "laptop" },
-              ].map((t) => (
-                <button
-                  key={t.value}
-                  onClick={() => setTheme(t.value as any)}
-                  className={`flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-xs font-medium transition-all ${
-                    theme === t.value || (theme === "system" && t.value === "system")
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border/70 hover:bg-muted/50 text-muted-foreground"
-                  }`}
-                >
-                  <Icon name={t.icon} className="size-5" />
-                  <span>{t.label}</span>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Data Backup & Management Card */}
         <Card className="border-border/60 shadow-none">

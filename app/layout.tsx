@@ -12,10 +12,9 @@ const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-serif" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
-  title: "Kori — Personal Finance Companion",
+  title: "Gorib manush | Personal Finance Companion",
   description:
-    "A calm, intelligent expense tracker that helps you understand your money, spend safely, and reach payday without stress.",
-  generator: "v0.app",
+    "A calm, intelligent expense tracker that helps you understand your money, spend safely, and reach payday without stress."
 }
 
 export const viewport: Viewport = {

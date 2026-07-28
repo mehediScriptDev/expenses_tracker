@@ -20,7 +20,7 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { href: "/", label: "Dashboard", icon: "layout-dashboard" },
+  { href: "/dashboard", label: "Dashboard", icon: "layout-dashboard" },
   { href: "/transactions", label: "Transactions", icon: "receipt-text" },
   { href: "/budgets", label: "Budgets", icon: "target" },
   { href: "/goals", label: "Savings Goals", icon: "trophy" },
@@ -74,6 +74,63 @@ function Brand() {
   )
 }
 
+function UserMenu() {
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        aria-label="User Menu"
+        className="flex h-9 items-center gap-1 rounded-full border border-neutral-300 bg-[#EBF3FA] px-3 font-mono font-bold text-xs text-[#2B4C7E] shadow-2xs hover:bg-[#DEEBF7] transition-all cursor-pointer"
+      >
+        <span>AA</span>
+        <Icon name={open ? "chevron-up" : "chevron-down"} className="size-3 text-[#2B4C7E]" />
+      </button>
+
+      {open && (
+        <div 
+          className="absolute right-0 mt-2 w-52 rounded-md border border-neutral-300 bg-white p-4 shadow-lg z-50 font-mono text-xs text-neutral-800 text-left animate-in fade-in zoom-in-95 duration-100"
+          onMouseLeave={() => setOpen(false)}
+        >
+          <div className="space-y-3">
+            <Link
+              href="/settings"
+              onClick={() => setOpen(false)}
+              className="block font-medium text-neutral-800 hover:text-black transition-colors"
+            >
+              Account Settings
+            </Link>
+
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="block font-medium text-neutral-800 hover:text-black transition-colors"
+            >
+              Home Page
+            </Link>
+
+            <div className="border-t border-neutral-200 pt-3">
+              <Link
+                href="/"
+                onClick={() => {
+                  setOpen(false)
+                  if (typeof window !== "undefined") {
+                    window.location.href = "/"
+                  }
+                }}
+                className="block font-medium text-neutral-700 hover:text-black transition-colors"
+              >
+                Logout
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { hydrated } = useStore()
@@ -115,7 +172,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 text-sm font-semibold transition-all rounded-tl-[4px] rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
+                    "flex items-center gap-3 px-3 py-2.5 text-sm font-semibold transition-all rounded-tl-lg rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
                     active
                       ? "bg-[#FFC700] text-black font-extrabold"
                       : "text-neutral-600 dark:text-muted-foreground hover:bg-white dark:hover:bg-muted hover:text-neutral-900 dark:hover:text-foreground",
@@ -151,40 +208,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Search / command */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCommandOpen(true)}
-                className="hidden sm:flex"
-              >
-                <Icon name="search" className="size-3.5" />
-                <span>Search</span>
-                <kbd className="rounded bg-neutral-100 dark:bg-neutral-700 px-1.5 py-0.5 text-[10px] font-mono border border-neutral-200 dark:border-neutral-600">
-                  ⌘K
-                </kbd>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCommandOpen(true)}
-                className="flex sm:hidden"
-                aria-label="Search"
-              >
-                <Icon name="search" className="size-4" />
-              </Button>
-
-              <ThemeToggle />
-
-              <Button onClick={ui.openAdd} size="sm">
-                <Icon name="plus" className="size-3.5" />
-                <span className="hidden sm:inline">Add</span>
-              </Button>
+              <UserMenu />
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:pb-10">
+          <main className="w-full px-4 pb-28 pt-6 sm:px-8 lg:px-10 lg:pb-10">
             {hydrated ? children : <LoadingScreen />}
           </main>
         </div>
@@ -198,7 +226,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-0.5 px-1 py-1.5 text-[11px] font-semibold transition-colors rounded-tl-[4px] rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
+                  "flex flex-1 flex-col items-center gap-0.5 px-1 py-1.5 text-[11px] font-semibold transition-colors rounded-tl-lg rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
                   active
                     ? "text-black bg-[#FFC700] font-bold"
                     : "text-neutral-500 dark:text-muted-foreground",

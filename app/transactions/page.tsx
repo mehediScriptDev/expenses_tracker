@@ -59,7 +59,7 @@ function TransactionsContent() {
   }, [filteredTransactions])
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-2">
+    <div className="w-full space-y-6 py-2">
       <PageHeader title="Transactions" description="All recorded expenses and income.">
         <Button onClick={ui.openAdd} className="gap-1.5 rounded-full px-5">
           <Icon name="plus" className="size-4" />

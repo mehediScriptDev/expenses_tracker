@@ -64,7 +64,7 @@ export function FinancialHealthCard() {
   }, [data.transactions])
 
   return (
-    <Card className="border-border/60 shadow-none bg-gradient-to-br from-card to-muted/20">
+    <Card className="border-border/60 shadow-none bg-linear-to-br from-card to-muted/20">
       <CardContent className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Score & Badge */}
         <div className="flex items-center gap-4">
