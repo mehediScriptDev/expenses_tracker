@@ -1,5 +1,5 @@
 import { parseISO } from "./format"
-import type { AppData, Category, Loan, Transaction } from "./types"
+import type { AppData, Category, Loan, Transaction } from "@/types"
 
 /* ------------------------------ lookups ------------------------------ */
 

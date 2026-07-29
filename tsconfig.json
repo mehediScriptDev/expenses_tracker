@@ -23,9 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@/landing/*": ["./app/(landing)/_components/*"],
+      "@/dashboard/*": ["./app/(dashboard)/_components/*"]
     }
   },
   "include": [

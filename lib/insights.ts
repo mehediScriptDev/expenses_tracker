@@ -10,7 +10,7 @@ import {
   quarterRange,
   loanTotals,
 } from "./selectors"
-import type { AppData, Transaction } from "./types"
+import type { AppData, Transaction } from "@/types"
 
 export type InsightTone = "positive" | "warning" | "danger" | "neutral"
 

@@ -10,7 +10,7 @@ import type {
   Loan,
   Settings,
   Transaction,
-} from "./types"
+} from "@/types"
 
 function uid(prefix = "tx") {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}_${Date.now().toString(36)}`

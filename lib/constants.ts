@@ -1,4 +1,4 @@
-import type { Category, Mood, PaymentMethod } from "./types"
+import type { Category, Mood, PaymentMethod } from "@/types"
 
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: "food", name: "Food", icon: "utensils", color: "var(--chart-1)", kind: "expense", isCustom: false },
@@ -57,4 +57,3 @@ export const CATEGORY_COLOR_CHOICES = [
 ]
 
 export const STORAGE_KEY = "finbuddy:data:v1"
-export const THEME_KEY = "finbuddy:theme"

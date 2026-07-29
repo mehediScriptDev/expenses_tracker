@@ -1,6 +1,6 @@
 import { DEFAULT_CATEGORIES } from "./constants"
 import { toISODate } from "./format"
-import type { AppData, Loan, Transaction } from "./types"
+import type { AppData, Loan, Transaction } from "@/types"
 
 let counter = 0
 function id(prefix = "t") {

@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Plus_Jakarta_Sans, Fraunces, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ThemeProvider } from "@/components/theme-provider"
 import { StoreProvider } from "@/lib/store"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
@@ -18,11 +17,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf8f3" },
-    { media: "(prefers-color-scheme: dark)", color: "#161614" },
-  ],
+  colorScheme: "light",
+  themeColor: "#faf8f3",
   width: "device-width",
   initialScale: 1,
 }
@@ -33,11 +29,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="bg-background">
+    <html lang="en" className="light bg-background">
       <body className={`${jakarta.variable} ${fraunces.variable} ${geistMono.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <StoreProvider>{children}</StoreProvider>
-        </ThemeProvider>
+        <StoreProvider>{children}</StoreProvider>
         <Toaster position="top-center" />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
