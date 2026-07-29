@@ -4,8 +4,8 @@ export function PartnerLogosSection() {
   const logos = [...PARTNER_LOGOS, ...PARTNER_LOGOS, ...PARTNER_LOGOS]
 
   return (
-    <section className="mt-20 border-t border-neutral-200/60 pt-10 w-full max-w-4xl space-y-6 overflow-hidden">
-      <p className="text-xs font-extrabold uppercase tracking-widest text-neutral-400">
+    <section className="mt-20 border-t border-neutral-200/60 pt-10 w-full max-w-4xl space-y-6 overflow-hidden text-center">
+      <p className="text-xs font-extrabold uppercase tracking-widest text-neutral-400 text-center">
         Trusted by the top companies in the world
       </p>
       <div className="relative overflow-hidden w-full py-2">

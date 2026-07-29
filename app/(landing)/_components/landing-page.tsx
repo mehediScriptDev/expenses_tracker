@@ -1,8 +1,9 @@
 import { LandingHeader } from "./landing-header"
 import { HeroSection } from "./hero-section"
 import { PartnerLogosSection } from "./partner-logos-section"
-import { FeaturesSection } from "./features-section"
-import { FeaturedSection } from "./featured-section"
+import { MethodSection } from "./method-section"
+import { WhatChangesSection } from "./what-changes-section"
+import { FinancialStagesSection } from "./financial-stages-section"
 import { TestimonialsSection } from "./testimonials-section"
 import { FaqSection } from "./faq-section"
 import { LandingFooter } from "./landing-footer"
@@ -24,8 +25,9 @@ export function LandingPage() {
       <main className="relative z-10 mx-auto container px-6 pt-12 pb-20 flex flex-col items-center">
         <HeroSection />
         <PartnerLogosSection />
-        <FeaturesSection />
-        <FeaturedSection />
+        <MethodSection />
+        <WhatChangesSection />
+        <FinancialStagesSection />
         <TestimonialsSection />
         <FaqSection />
         <LandingFooter />

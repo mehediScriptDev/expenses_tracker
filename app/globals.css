@@ -179,7 +179,7 @@
 .animate-marquee-left {
   display: flex;
   width: max-content;
-  animation: marquee-left 35s linear infinite;
+  animation: marquee-left 65s linear infinite;
 }
 
 .animate-marquee-left:hover {
@@ -189,7 +189,7 @@
 .animate-marquee-right {
   display: flex;
   width: max-content;
-  animation: marquee-right 35s linear infinite;
+  animation: marquee-right 65s linear infinite;
 }
 
 .animate-marquee-right:hover {

@@ -10,10 +10,9 @@ interface SectionHeadingProps {
 export function SectionHeading({ icon, label, title, description }: SectionHeadingProps) {
   return (
     <div className="text-center space-y-3">
-      <div className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1 text-xs font-bold text-neutral-700 shadow-2xs">
-        <Icon name={icon} className="size-3.5 text-[#00A86B]" />
-        <span>{label}</span>
-      </div>
+      <p className="text-xs sm:text-sm font-medium text-neutral-500 tracking-wide">
+        {label}
+      </p>
       <h2 className="font-serif text-3xl sm:text-5xl font-black text-neutral-900 tracking-tight">
         {title}
       </h2>

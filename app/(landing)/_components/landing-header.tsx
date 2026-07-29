@@ -18,7 +18,7 @@ export function LandingHeader() {
 
       <div className="flex items-center gap-3">
         <Button variant="outline" size="lg" asChild>
-          <Link href="/settings">About us</Link>
+          <Link href="#">Who's for</Link>
         </Button>
         <Button size="lg" asChild>
           <Link href="/dashboard">Dashboard →</Link>

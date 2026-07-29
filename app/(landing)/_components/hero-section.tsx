@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button"
 export function HeroSection() {
   return (
     <section className="text-center flex flex-col items-center">
-      <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-neutral-700 shadow-2xs mb-8 transition-all cursor-pointer">
-        <span className="size-2 rounded-full bg-[#00A86B] animate-pulse" />
-        <span>#1 Personal Finance & Expense App</span>
-        <Icon name="arrow-right" className="size-3.5 text-neutral-400" />
-      </div>
+      <p className="text-xs sm:text-sm font-medium text-neutral-500 mb-6 tracking-wide">
+        #1 Personal Finance & Expense App
+      </p>
 
       <h1 className="font-serif text-4xl sm:text-6xl font-black text-neutral-900 tracking-tight leading-[1.15] max-w-3xl text-balance">
         Take Control of Your Finances All in One App

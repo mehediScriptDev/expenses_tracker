@@ -45,34 +45,38 @@ function TestimonialMarquee({
         {repeated.map((t, idx) => (
           <article
             key={idx}
-            className={`w-[320px] shrink-0 ${cardRadius} border border-neutral-200/80 bg-white p-5 transition-all text-left space-y-3.5 flex flex-col justify-between`}
+            className="w-[320px] sm:w-85 shrink-0 rounded-xl bg-white p-6 transition-all text-left space-y-4 flex flex-col justify-between"
           >
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-0.5 text-amber-400">
+            <div className="space-y-3">
+              {/* 5 Yellow Stars */}
+              <div className="flex items-center gap-1 text-[#FFC700]">
                 {[...Array(5)].map((_, i) => (
-                  <Icon key={i} name="star" className="size-3.5 fill-amber-400 text-amber-400" />
+                  <Icon key={i} name="star" className="size-4 fill-[#FFC700] text-[#FFC700]" />
                 ))}
               </div>
+
+              {/* Quote */}
               <p className="text-sm text-neutral-800 leading-relaxed font-medium">&ldquo;{t.quote}&rdquo;</p>
             </div>
 
-            <div className="flex items-center gap-3 pt-3 border-t border-neutral-100">
+            {/* Person Info - No Divider Line */}
+            <div className="flex items-center gap-3 pt-2">
               {t.avatar.startsWith("/") ? (
                 <Image
                   src={t.avatar}
                   alt={t.name}
-                  width={44}
-                  height={44}
-                  className={`size-11 rounded-full object-cover shrink-0 ${avatarRing} shadow-2xs`}
+                  width={40}
+                  height={40}
+                  className="size-10 rounded-full object-cover shrink-0 ring-2 ring-neutral-200/60"
                 />
               ) : (
-                <span className={`flex size-11 items-center justify-center rounded-full ${fallbackBg} text-xl ${avatarRing}`}>
+                <span className={`flex size-10 items-center justify-center rounded-full ${fallbackBg} text-lg`}>
                   {t.avatar}
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-bold text-neutral-900 truncate tracking-tight">{t.name}</h4>
-                <p className="text-xs text-neutral-500 truncate font-normal">{t.role}</p>
+                <h4 className="text-xs font-mono font-bold text-neutral-900 truncate uppercase tracking-wider">{t.name}</h4>
+                <p className="text-[11px] text-neutral-500 truncate font-normal">{t.role}</p>
               </div>
             </div>
           </article>
