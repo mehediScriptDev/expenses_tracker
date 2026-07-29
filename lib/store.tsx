@@ -1,19 +1,34 @@
 "use client"
 
 import * as React from "react"
-import { STORAGE_KEY } from "./constants"
+import { STORAGE_KEY, DEFAULT_QUICK_ADD_PRESETS } from "./constants"
 import { buildSeedData, emptyData } from "./seed"
 import type {
   AppData,
   Budgets,
   Category,
   Loan,
+  QuickAddPreset,
   Settings,
   Transaction,
 } from "@/types"
 
 function uid(prefix = "tx") {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}_${Date.now().toString(36)}`
+}
+
+function normalizeData(raw: AppData): AppData {
+  return {
+    ...raw,
+    categories: (raw.categories ?? []).map((c) => ({
+      ...c,
+      color: c.color === "var(--chart-1)" ? "var(--chart-4)" : c.color,
+    })),
+    quickAddPresets:
+      Array.isArray(raw.quickAddPresets) && raw.quickAddPresets.length > 0
+        ? raw.quickAddPresets
+        : DEFAULT_QUICK_ADD_PRESETS.map((p) => ({ ...p })),
+  }
 }
 
 function load(): AppData {
@@ -25,7 +40,7 @@ function load(): AppData {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded))
       return seeded
     }
-    return JSON.parse(raw) as AppData
+    return normalizeData(JSON.parse(raw) as AppData)
   } catch {
     return buildSeedData()
   }
@@ -59,6 +74,10 @@ interface StoreValue {
   removeBudget: (categoryId: string) => void
   setBudgets: (b: Budgets) => void
   updateSettings: (patch: Partial<Settings>) => void
+  // quick add presets
+  addQuickAddPreset: (preset: Omit<QuickAddPreset, "id">) => void
+  updateQuickAddPreset: (id: string, patch: Partial<QuickAddPreset>) => void
+  deleteQuickAddPreset: (id: string) => void
   // data mgmt
   replaceAll: (data: AppData) => void
   resetAll: () => void
@@ -191,7 +210,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setBudgets: (b) => setData((d) => ({ ...d, budgets: b })),
       updateSettings: (patch) =>
         setData((d) => ({ ...d, settings: { ...d.settings, ...patch } })),
-      replaceAll: (next) => setData(next),
+      addQuickAddPreset: (preset) =>
+        setData((d) => ({
+          ...d,
+          quickAddPresets: [...d.quickAddPresets, { ...preset, id: uid("qa") }],
+        })),
+      updateQuickAddPreset: (id, patch) =>
+        setData((d) => ({
+          ...d,
+          quickAddPresets: d.quickAddPresets.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+        })),
+      deleteQuickAddPreset: (id) =>
+        setData((d) => ({
+          ...d,
+          quickAddPresets: d.quickAddPresets.filter((p) => p.id !== id),
+        })),
+      replaceAll: (next) => setData(normalizeData(next)),
       resetAll: () => setData(emptyData()),
       loadDemo: () => setData(buildSeedData()),
     }

@@ -2,7 +2,19 @@
 
 import * as React from "react"
 import { useUI } from "@/dashboard/layout/app-shell"
-import { PageHeader, EmptyState } from "@/dashboard/shared"
+import {
+  PageHeader,
+  EmptyState,
+  dashSegment,
+  dashSegmentItem,
+  dashSegmentItemActive,
+  dashInput,
+  DashPage,
+  StatTile,
+  StatGrid,
+  FilterToolbar,
+  DateGroupHeader,
+} from "@/dashboard/shared"
 import { TransactionRow } from "@/dashboard/transactions/transaction-row"
 import { useStore } from "@/lib/store"
 import { getCategory, sumExpenses, sumIncome } from "@/lib/selectors"
@@ -10,7 +22,7 @@ import { formatMoney } from "@/lib/format"
 import { Icon } from "@/lib/icon"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 type TypeFilter = "all" | "expense" | "income"
 
@@ -47,7 +59,12 @@ function TransactionsContent() {
       .sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.createdAt || 0) - (a.createdAt || 0))
   }, [data, search, typeFilter])
 
-  // Group by date
+  const totals = React.useMemo(() => {
+    const income = sumIncome(filteredTransactions)
+    const expense = sumExpenses(filteredTransactions)
+    return { income, expense, net: income - expense, count: filteredTransactions.length }
+  }, [filteredTransactions])
+
   const grouped = React.useMemo(() => {
     const groups: { [date: string]: typeof filteredTransactions } = {}
     for (const tx of filteredTransactions) {
@@ -59,97 +76,137 @@ function TransactionsContent() {
   }, [filteredTransactions])
 
   return (
-    <div className="w-full space-y-6 py-2">
-      <PageHeader title="Transactions" description="All recorded expenses and income.">
-        <Button onClick={ui.openAdd} className="gap-1.5 rounded-full px-5">
+    <DashPage>
+      <PageHeader title="Transactions" description="Search, filter, and review every expense and income entry.">
+        <Button variant="dash" onClick={ui.openAdd} className="h-11 w-full gap-1.5 px-5 sm:w-auto">
           <Icon name="plus" className="size-4" />
-          Add Transaction
+          Add transaction
         </Button>
       </PageHeader>
 
-      {/* Search and Simple Type Filter */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
+      <StatGrid>
+        <StatTile
+          icon="receipt-text"
+          label="Showing"
+          value={totals.count}
+          subtext={search || typeFilter !== "all" ? "Filtered results" : "All records"}
+        />
+        <StatTile
+          icon="arrow-down-left"
+          label="Income"
+          value={formatMoney(totals.income, { symbol: data.settings.currencySymbol })}
+          tone="success"
+        />
+        <StatTile
+          icon="arrow-up-right"
+          label="Expenses"
+          value={formatMoney(totals.expense, { symbol: data.settings.currencySymbol })}
+          tone="default"
+        />
+        <StatTile
+          icon="scale"
+          label="Net"
+          value={formatMoney(totals.net, { symbol: data.settings.currencySymbol, sign: true })}
+          tone={totals.net >= 0 ? "success" : "danger"}
+        />
+      </StatGrid>
+
+      <FilterToolbar>
+        <div className="relative min-w-0 flex-1">
           <Icon
             name="search"
-            className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-(--dash-text-faint)"
           />
           <Input
-            placeholder="Search description or category..."
+            placeholder="Search description, category, or merchant..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 h-10 rounded-full border-border/60 bg-card text-xs"
+            className={cn(dashInput, "border-0 bg-(--dash-surface) pl-10 shadow-none")}
           />
-          {search && (
+          {search ? (
             <button
+              type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-(--dash-text-muted) hover:text-(--dash-text)"
+              aria-label="Clear search"
             >
               <Icon name="x" className="size-4" />
             </button>
-          )}
+          ) : null}
         </div>
 
-        <div className="flex items-center rounded-full bg-muted p-1 text-xs shrink-0">
+        <div className={cn(dashSegment, "w-full shrink-0 bg-(--dash-surface) sm:w-auto")}>
           {(["all", "expense", "income"] as TypeFilter[]).map((tf) => (
             <button
               key={tf}
+              type="button"
               onClick={() => setTypeFilter(tf)}
-              className={`rounded-full px-3.5 py-1.5 font-medium capitalize transition-all ${
-                typeFilter === tf
-                  ? "bg-background text-foreground shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={cn(
+                dashSegmentItem,
+                "capitalize",
+                typeFilter === tf ? dashSegmentItemActive : "hover:text-(--dash-text)",
+              )}
             >
               {tf}
             </button>
           ))}
         </div>
-      </div>
+      </FilterToolbar>
 
-      {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
         <EmptyState
           icon="receipt-text"
-          title="No transactions"
-          message="No activity found matching your search."
+          title="No transactions found"
+          message={
+            search || typeFilter !== "all"
+              ? "Nothing matches your current filters. Try adjusting search or type."
+              : "Your ledger is empty. Add your first expense or income to get started."
+          }
           action={
-            search ? (
-              <Button variant="outline" onClick={() => setSearch("")}>
-                Clear Search
+            search || typeFilter !== "all" ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearch("")
+                  setTypeFilter("all")
+                }}
+              >
+                Clear filters
               </Button>
             ) : (
-              <Button onClick={ui.openAdd}>Add First Transaction</Button>
+              <Button variant="dash" onClick={ui.openAdd}>
+                Add first transaction
+              </Button>
             )
           }
         />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {grouped.map(([date, txs]) => {
             const dayIncome = sumIncome(txs)
             const dayExpense = sumExpenses(txs)
 
             return (
-              <div key={date} className="space-y-2">
-                <div className="flex items-center justify-between px-2 text-xs text-muted-foreground font-medium">
-                  <span>{date}</span>
-                  <div className="flex items-center gap-2 font-mono">
-                    {dayIncome > 0 && <span className="text-success">+{formatMoney(dayIncome, { symbol: data.settings.currencySymbol })}</span>}
-                    {dayExpense > 0 && <span>-{formatMoney(dayExpense, { symbol: data.settings.currencySymbol })}</span>}
-                  </div>
-                </div>
+              <section key={date} className="space-y-3">
+                <DateGroupHeader
+                  date={date}
+                  income={dayIncome}
+                  expense={dayExpense}
+                  currencySymbol={data.settings.currencySymbol}
+                  count={txs.length}
+                />
 
-                <Card className="border-border/50 shadow-none divide-y divide-border/40 overflow-hidden rounded-2xl">
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
                   {txs.map((tx) => (
                     <TransactionRow key={tx.id} tx={tx} onEdit={ui.openEdit} showDate={false} />
                   ))}
-                </Card>
-              </div>
+                </div>
+              </section>
             )
           })}
         </div>
       )}
-    </div>
+    </DashPage>
   )
 }
 

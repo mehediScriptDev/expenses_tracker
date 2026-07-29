@@ -51,7 +51,7 @@ export function FinancialHealthCard() {
     totalScore >= 90
       ? { label: "Financial Champion", badge: "A+", tone: "text-success bg-success/10 border-success/30" }
       : totalScore >= 75
-      ? { label: "Healthy & Balanced", badge: "B+", tone: "text-primary bg-primary/10 border-primary/30" }
+      ? { label: "Healthy & Balanced", badge: "B+", tone: "text-[#2B4C7E] bg-[#D4E4FF] border-[#D4E4FF]" }
       : totalScore >= 60
       ? { label: "Moderate Caution", badge: "C", tone: "text-warning bg-warning/10 border-warning/30" }
       : { label: "Needs Restructuring", badge: "D", tone: "text-destructive bg-destructive/10 border-destructive/30" }
@@ -64,11 +64,10 @@ export function FinancialHealthCard() {
   }, [data.transactions])
 
   return (
-    <Card className="border-border/60 shadow-none bg-linear-to-br from-card to-muted/20">
+    <Card className="dash-card py-0 bg-linear-to-br from-white to-[#F2EFE9]/50">
       <CardContent className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Score & Badge */}
         <div className="flex items-center gap-4">
-          <div className="relative flex size-16 items-center justify-center rounded-2xl bg-background border border-border shadow-inner font-mono">
+          <div className="relative flex size-16 items-center justify-center rounded-xl bg-[#F2EFE9] font-mono">
             <div className="text-center">
               <span className="text-2xl font-black tracking-tight">{totalScore}</span>
               <span className="block text-[9px] text-muted-foreground uppercase font-bold">/ 100</span>
@@ -77,7 +76,7 @@ export function FinancialHealthCard() {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className={`rounded-md border px-2 py-0.5 text-xs font-bold ${grade.tone}`}>
+              <span className={`rounded-lg px-2 py-0.5 text-xs font-bold ${grade.tone}`}>
                 {grade.badge}
               </span>
               <span className="text-sm font-semibold">{grade.label}</span>
@@ -90,7 +89,7 @@ export function FinancialHealthCard() {
         </div>
 
         {/* Streak Counter */}
-        <div className="flex items-center gap-2 rounded-xl bg-orange-500/10 border border-orange-500/20 px-3 py-2 text-orange-600 dark:text-orange-400">
+        <div className="flex items-center gap-2 rounded-xl bg-[#F8D7C4]/40 px-3 py-2 text-[#C47A5A]">
           <Icon name="flame" className="size-5 animate-pulse" />
           <div>
             <p className="text-xs font-bold">{streakDays} Day Streak!</p>

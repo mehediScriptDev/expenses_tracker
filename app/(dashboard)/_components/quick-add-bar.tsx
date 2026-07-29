@@ -4,44 +4,31 @@ import * as React from "react"
 import { useStore } from "@/lib/store"
 import { Icon } from "@/lib/icon"
 import { todayISO, nowTime, formatMoney } from "@/lib/format"
-import type { PaymentMethod } from "@/types"
+import type { QuickAddPreset } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { DashboardCard, dashCaption, dashInput, dashMuted } from "@/dashboard/shared"
+import { QuickAddPresetsManager } from "@/dashboard/quick-add-presets-manager"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-
-interface Preset {
-  label: string
-  icon: string
-  amount: number
-  categoryId: string
-  paymentMethod: PaymentMethod
-}
-
-const PRESETS: Preset[] = [
-  { label: "Coffee", icon: "coffee", amount: 50, categoryId: "food", paymentMethod: "cash" },
-  { label: "Bus", icon: "bus", amount: 40, categoryId: "transport", paymentMethod: "cash" },
-  { label: "Lunch", icon: "utensils", amount: 150, categoryId: "food", paymentMethod: "bkash" },
-  { label: "Fuel", icon: "fuel", amount: 200, categoryId: "fuel", paymentMethod: "cash" },
-  { label: "Groceries", icon: "shopping-bag", amount: 500, categoryId: "food", paymentMethod: "bkash" },
-]
 
 export function QuickAddBar() {
   const { data, addTransaction, deleteTransaction } = useStore()
   const [text, setText] = React.useState("")
 
-  // Smart natural text parser
+  const presets = data.quickAddPresets
+
   const parsed = React.useMemo(() => {
     if (!text.trim()) return null
 
     const tokens = text.trim().split(/\s+/)
     let amount = 0
     let categoryId = "other"
-    let paymentMethod: PaymentMethod = "cash"
+    let paymentMethod: typeof data.transactions[0]["paymentMethod"] = "cash"
     let type: "expense" | "income" = "expense"
     const descWords: string[] = []
 
-    const paymentKeywords: Record<string, PaymentMethod> = {
+    const paymentKeywords: Record<string, typeof paymentMethod> = {
       cash: "cash",
       bkash: "bkash",
       nagad: "nagad",
@@ -50,31 +37,26 @@ export function QuickAddBar() {
       bank: "bank",
     }
 
-    // Attempt to match category IDs or category names
     const catMap = new Map(data.categories.map((c) => [c.id, c.id]))
     const catNameMap = new Map(data.categories.map((c) => [c.name.toLowerCase(), c.id]))
 
     for (const token of tokens) {
       const lower = token.toLowerCase()
 
-      // Amount detection (numeric string like 150 or 250.50)
       if (!amount && /^\d+(\.\d+)?$/.test(token)) {
         amount = parseFloat(token)
         continue
       }
 
-      // Payment method match
       if (paymentKeywords[lower]) {
         paymentMethod = paymentKeywords[lower]
         continue
       }
 
-      // Income keyword check
       if (lower === "income" || lower === "salary" || lower === "freelance") {
         type = "income"
       }
 
-      // Category match
       if (catMap.has(lower)) {
         categoryId = catMap.get(lower)!
         continue
@@ -88,16 +70,10 @@ export function QuickAddBar() {
 
     const description = descWords.join(" ") || "Quick Transaction"
 
-    return {
-      amount,
-      description,
-      categoryId,
-      paymentMethod,
-      type,
-    }
+    return { amount, description, categoryId, paymentMethod, type }
   }, [text, data.categories])
 
-  const handleQuickAddPreset = (preset: Preset) => {
+  const handleQuickAddPreset = (preset: QuickAddPreset) => {
     const tx = addTransaction({
       type: "expense",
       amount: preset.amount,
@@ -111,10 +87,7 @@ export function QuickAddBar() {
     })
 
     toast.success(`Added ${preset.label} (${formatMoney(preset.amount, { symbol: data.settings.currencySymbol })})`, {
-      action: {
-        label: "Undo",
-        onClick: () => deleteTransaction(tx.id),
-      },
+      action: { label: "Undo", onClick: () => deleteTransaction(tx.id) },
     })
   }
 
@@ -140,90 +113,80 @@ export function QuickAddBar() {
     setText("")
     toast.success(
       `Added ${parsed.description} (${formatMoney(parsed.amount, { symbol: data.settings.currencySymbol })})`,
-      {
-        action: {
-          label: "Undo",
-          onClick: () => deleteTransaction(tx.id),
-        },
-      },
+      { action: { label: "Undo", onClick: () => deleteTransaction(tx.id) } },
     )
   }
 
   return (
-    <Card className="border-border/70 shadow-none bg-linear-to-r from-card via-background to-card">
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold flex items-center gap-1.5 text-muted-foreground">
-            <Icon name="bolt" className="size-4 text-warning" />
-            1-Tap Quick Expenses & Smart Entry
-          </span>
-          <span className="text-[11px] text-muted-foreground hidden sm:inline">
-            Type e.g. &quot;Lunch 180 food bkash&quot;
-          </span>
+    <DashboardCard
+      title="Quick add"
+      description="Log spending in one tap or one line"
+      action={<QuickAddPresetsManager compact />}
+      bodyClassName="space-y-4"
+    >
+      {presets.length === 0 ? (
+        <div className={cn(dashMuted, "px-4 py-6 text-center")}>
+          <p className="text-sm font-semibold text-(--dash-text)">No quick-add buttons yet</p>
+          <p className={cn(dashCaption, "mt-1")}>
+            Add presets in Settings to log coffee, lunch, transport, and more in one tap.
+          </p>
         </div>
-
-        {/* 1-Tap Presets Row */}
+      ) : (
         <div className="flex flex-wrap gap-2">
-          {PRESETS.map((p) => (
+          {presets.map((p) => (
             <button
-              key={p.label}
+              key={p.id}
+              type="button"
               onClick={() => handleQuickAddPreset(p)}
-              className="flex items-center gap-1.5 rounded-full border border-border/80 bg-background px-3 py-1 text-xs font-medium hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all active:scale-95"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-(--dash-muted) px-3 py-2.5 text-sm font-medium text-(--dash-text) transition-colors hover:bg-(--dash-muted-hover)"
             >
-              <Icon name={p.icon} className="size-3.5" />
+              <Icon name={p.icon} className="size-4 text-(--dash-text-muted)" />
               <span>{p.label}</span>
-              <span className="font-mono text-muted-foreground">
+              <span className="font-mono text-sm font-semibold text-(--dash-text-muted)">
                 {formatMoney(p.amount, { symbol: data.settings.currencySymbol })}
               </span>
             </button>
           ))}
         </div>
+      )}
 
-        {/* Natural language text entry */}
-        <form onSubmit={handleSmartSubmit} className="flex gap-2 pt-1">
-          <div className="relative flex-1">
-            <Input
-              placeholder="Quick Add e.g. 'Subway 250 food' or 'Tea 30'..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="h-9 text-xs pr-8"
-            />
-            {text && (
-              <button
-                type="button"
-                onClick={() => setText("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <Icon name="x" className="size-3.5" />
-              </button>
-            )}
-          </div>
-          <Button type="submit" size="sm" className="h-9 px-3 text-xs gap-1.5 shrink-0">
-            <Icon name="plus" className="size-3.5" />
-            Log
-          </Button>
-        </form>
+      <form onSubmit={handleSmartSubmit} className="flex flex-col gap-2 sm:flex-row">
+        <div className="relative min-w-0 flex-1">
+          <Input
+            placeholder="e.g. Lunch 180 food bkash"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className={dashInput}
+          />
+          {text ? (
+            <button
+              type="button"
+              onClick={() => setText("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-(--dash-text-faint) hover:text-(--dash-text)"
+              aria-label="Clear input"
+            >
+              <Icon name="x" className="size-4" />
+            </button>
+          ) : null}
+        </div>
+        <Button type="submit" variant="dash" className="h-11 w-full shrink-0 px-5 sm:w-auto">
+          Log
+        </Button>
+      </form>
 
-        {/* Smart Live Parsing Preview */}
-        {parsed && parsed.amount > 0 && (
-          <div className="flex items-center justify-between rounded-md bg-muted/60 px-3 py-1.5 text-xs text-muted-foreground animate-in fade-in duration-200">
-            <span className="truncate">
-              Description: <strong className="text-foreground">{parsed.description}</strong>
-            </span>
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="rounded bg-background px-1.5 py-0.5 text-[10px] uppercase font-semibold">
-                {parsed.categoryId}
-              </span>
-              <span className="rounded bg-background px-1.5 py-0.5 text-[10px] uppercase font-semibold">
-                {parsed.paymentMethod}
-              </span>
-              <span className="font-mono font-bold text-foreground">
-                {formatMoney(parsed.amount, { symbol: data.settings.currencySymbol })}
-              </span>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      {parsed && parsed.amount > 0 ? (
+        <div className={cn(dashMuted, "px-4 py-3 text-sm")}>
+          <span className="font-semibold text-(--dash-text)">{parsed.description}</span>
+          <span className="mx-2 text-(--dash-text-faint)">·</span>
+          <span className="font-medium uppercase text-(--dash-text-muted)">{parsed.categoryId}</span>
+          <span className="mx-2 text-(--dash-text-faint)">·</span>
+          <span className="font-mono font-bold text-(--dash-text)">
+            {formatMoney(parsed.amount, { symbol: data.settings.currencySymbol })}
+          </span>
+        </div>
+      ) : (
+        <p className={dashCaption}>Tip: type amount, description, category, and payment method together.</p>
+      )}
+    </DashboardCard>
   )
 }

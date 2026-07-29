@@ -68,6 +68,15 @@ export interface Settings {
   currencySymbol: string
 }
 
+export interface QuickAddPreset {
+  id: string
+  label: string
+  icon: string
+  amount: number
+  categoryId: string
+  paymentMethod: PaymentMethod
+}
+
 /** category id -> monthly budget amount */
 export type Budgets = Record<string, number>
 
@@ -78,4 +87,5 @@ export interface AppData {
   transactions: Transaction[]
   loans: Loan[]
   budgets: Budgets
+  quickAddPresets: QuickAddPreset[]
 }

@@ -1,14 +1,26 @@
 "use client"
 
 import * as React from "react"
-import { PageHeader, EmptyState, CategoryBadge } from "@/dashboard/shared"
+import {
+  PageHeader,
+  EmptyState,
+  CategoryBadge,
+  dashSegment,
+  dashSegmentItem,
+  dashSegmentItemActive,
+  dashInput,
+  DashPage,
+  StatTile,
+  StatGrid,
+  FilterToolbar,
+  StatusBadge,
+} from "@/dashboard/shared"
 import { useStore } from "@/lib/store"
 import { formatMoney } from "@/lib/format"
 import { Icon } from "@/lib/icon"
 import { CATEGORY_COLOR_CHOICES, CATEGORY_ICON_CHOICES } from "@/lib/constants"
 import type { Category, CategoryKind } from "@/types"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
   Dialog,
@@ -18,6 +30,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +48,6 @@ export default function CategoriesPage() {
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [editingCategory, setEditingCategory] = React.useState<Category | null>(null)
 
-  // Compute spend / income per category this month
   const categoryStats = React.useMemo(() => {
     const stats: Record<string, { total: number; count: number }> = {}
     for (const tx of data.transactions) {
@@ -57,6 +69,14 @@ export default function CategoriesPage() {
     })
   }, [data.categories, kindFilter, search])
 
+  const expenseCount = data.categories.filter((c) => c.kind === "expense").length
+  const incomeCount = data.categories.filter((c) => c.kind === "income").length
+  const filteredTotal = filteredCategories.reduce(
+    (sum, cat) => sum + (categoryStats[cat.id]?.total ?? 0),
+    0,
+  )
+  const budgetedCount = filteredCategories.filter((c) => Boolean(data.budgets[c.id])).length
+
   const handleOpenAdd = () => {
     setEditingCategory(null)
     setDialogOpen(true)
@@ -68,156 +88,174 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="space-y-6">
-        <PageHeader
-          title="Categories"
-          description="Organize your expenses and income with custom icons, colors, and classifications."
-        >
-          <Button onClick={handleOpenAdd} className="gap-1.5">
-            <Icon name="plus" className="size-4" />
-            Add Category
-          </Button>
-        </PageHeader>
+    <DashPage>
+      <PageHeader
+        title="Categories"
+        description="Organize spending and income with custom icons, colors, and labels."
+      >
+        <Button variant="dash" onClick={handleOpenAdd} className="gap-1.5">
+          <Icon name="plus" className="size-4" />
+          Add category
+        </Button>
+      </PageHeader>
 
-        {/* Filter and Search Bar */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-1 rounded-lg bg-muted p-1 text-xs">
-            <button
-              onClick={() => setKindFilter("expense")}
-              className={`rounded-md px-3 py-1.5 font-medium transition-all ${
-                kindFilter === "expense"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Expense Categories ({data.categories.filter((c) => c.kind === "expense").length})
-            </button>
-            <button
-              onClick={() => setKindFilter("income")}
-              className={`rounded-md px-3 py-1.5 font-medium transition-all ${
-                kindFilter === "income"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Income Categories ({data.categories.filter((c) => c.kind === "income").length})
-            </button>
-            <button
-              onClick={() => setKindFilter("all")}
-              className={`rounded-md px-3 py-1.5 font-medium transition-all ${
-                kindFilter === "all"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              All
-            </button>
-          </div>
+      <StatGrid>
+        <StatTile icon="shapes" label="Expense" value={expenseCount} subtext="categories" />
+        <StatTile icon="wallet" label="Income" value={incomeCount} subtext="categories" tone="success" />
+        <StatTile
+          icon="receipt-text"
+          label="Activity"
+          value={formatMoney(filteredTotal, { symbol: data.settings.currencySymbol, compact: true })}
+          subtext="in current view"
+        />
+        <StatTile icon="target" label="Budgeted" value={budgetedCount} tone="accent" />
+      </StatGrid>
 
-          <div className="relative sm:w-64">
-            <Icon name="search" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search category name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 text-xs"
-            />
-          </div>
+      <FilterToolbar>
+        <div className={cn(dashSegment, "w-full bg-[var(--dash-surface)] sm:w-auto")}>
+          <button
+            type="button"
+            onClick={() => setKindFilter("expense")}
+            className={cn(
+              dashSegmentItem,
+              kindFilter === "expense" ? dashSegmentItemActive : "hover:text-[var(--dash-text)]",
+            )}
+          >
+            Expense ({expenseCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setKindFilter("income")}
+            className={cn(
+              dashSegmentItem,
+              kindFilter === "income" ? dashSegmentItemActive : "hover:text-[var(--dash-text)]",
+            )}
+          >
+            Income ({incomeCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setKindFilter("all")}
+            className={cn(
+              dashSegmentItem,
+              kindFilter === "all" ? dashSegmentItemActive : "hover:text-[var(--dash-text)]",
+            )}
+          >
+            All
+          </button>
         </div>
 
-        {/* Category Cards Grid */}
-        {filteredCategories.length === 0 ? (
-          <EmptyState
-            icon="shapes"
-            title="No categories found"
-            message="No categories matched your search criteria."
-            action={<Button onClick={handleOpenAdd}>Add Category</Button>}
+        <div className="relative w-full sm:w-72">
+          <Icon
+            name="search"
+            className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--dash-text-faint)]"
           />
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredCategories.map((cat) => {
-              const stat = categoryStats[cat.id] ?? { total: 0, count: 0 }
-              const isBudgeted = Boolean(data.budgets[cat.id])
+          <Input
+            placeholder="Search by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={cn(dashInput, "border-0 bg-[var(--dash-surface)] pl-10 shadow-none")}
+          />
+        </div>
+      </FilterToolbar>
 
-              return (
-                <Card key={cat.id} className="border-border/60 shadow-none hover:border-border transition-colors">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <CategoryBadge icon={cat.icon} color={cat.color} size="md" />
-                      <div className="min-w-0 space-y-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-sm font-semibold truncate">{cat.name}</h4>
-                          {cat.isCustom && (
-                            <span className="rounded bg-primary/10 px-1.5 py-0.2 text-[10px] font-medium text-primary">
-                              Custom
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{stat.count} tx</span>
-                          <span>·</span>
-                          <span className="font-mono">
-                            {formatMoney(stat.total, { symbol: data.settings.currencySymbol })}
-                          </span>
-                          {isBudgeted && (
-                            <>
-                              <span>·</span>
-                              <span className="text-primary font-medium">Budgeted</span>
-                            </>
-                          )}
-                        </div>
+      {filteredCategories.length === 0 ? (
+        <EmptyState
+          icon="shapes"
+          title="No categories found"
+          message="Adjust your filters or create a new category to get started."
+          action={<Button variant="dash" onClick={handleOpenAdd}>Add category</Button>}
+        />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {filteredCategories.map((cat) => {
+            const stat = categoryStats[cat.id] ?? { total: 0, count: 0 }
+            const isBudgeted = Boolean(data.budgets[cat.id])
+
+            return (
+              <article
+                key={cat.id}
+                className="dash-card group relative overflow-hidden transition-shadow hover:shadow-md"
+              >
+                <div
+                  className="absolute inset-y-0 left-0 w-1.5"
+                  style={{ backgroundColor: cat.color }}
+                  aria-hidden
+                />
+
+                <div className="flex items-start justify-between gap-3 p-5 pl-6">
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                    <CategoryBadge icon={cat.icon} color={cat.color} size="md" />
+                    <div className="min-w-0 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="truncate text-base font-semibold text-[var(--dash-text)]">{cat.name}</h3>
+                        {cat.isCustom ? <StatusBadge tone="accent">Custom</StatusBadge> : null}
+                        {isBudgeted ? <StatusBadge tone="neutral">Budgeted</StatusBadge> : null}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--dash-text-muted)]">
+                        <span className="inline-flex items-center gap-1">
+                          <Icon name="receipt-text" className="size-3.5" />
+                          {stat.count} tx
+                        </span>
+                        <span className="font-mono font-semibold text-[var(--dash-text)]">
+                          {formatMoney(stat.total, { symbol: data.settings.currencySymbol })}
+                        </span>
+                        <span className="capitalize">{cat.kind}</span>
                       </div>
                     </div>
+                  </div>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground shrink-0">
-                            <Icon name="ellipsis-vertical" className="size-4" />
-                          </Button>
-                        }
-                      />
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenEdit(cat)}>
-                          <Icon name="pencil" className="size-4" />
-                          Edit Category
-                        </DropdownMenuItem>
-                        {cat.isCustom && (
-                          <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onClick={() => deleteCategory(cat.id)}
-                            >
-                              <Icon name="trash-2" className="size-4" />
-                              Delete Category
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      render={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 shrink-0 text-[var(--dash-text-muted)] opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                          aria-label={`Actions for ${cat.name}`}
+                        >
+                          <Icon name="ellipsis-vertical" className="size-4" />
+                        </Button>
+                      }
+                    />
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleOpenEdit(cat)}>
+                        <Icon name="pencil" className="size-4" />
+                        Edit category
+                      </DropdownMenuItem>
+                      {cat.isCustom ? (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem variant="destructive" onClick={() => deleteCategory(cat.id)}>
+                            <Icon name="trash-2" className="size-4" />
+                            Delete category
+                          </DropdownMenuItem>
+                        </>
+                      ) : null}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      )}
 
-        {/* Add/Edit Modal */}
-        <CategoryModal
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          editingCategory={editingCategory}
-          onSave={(catData) => {
-            if (editingCategory) {
-              updateCategory(editingCategory.id, catData)
-            } else {
-              addCategory(catData)
-            }
-            setDialogOpen(false)
-          }}
-        />
-    </div>
+      <CategoryModal
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editingCategory={editingCategory}
+        onSave={(catData) => {
+          if (editingCategory) {
+            updateCategory(editingCategory.id, catData)
+          } else {
+            addCategory(catData)
+          }
+          setDialogOpen(false)
+        }}
+      />
+    </DashPage>
   )
 }
 
@@ -235,7 +273,7 @@ function CategoryModal({
   const [name, setName] = React.useState("")
   const [kind, setKind] = React.useState<CategoryKind>("expense")
   const [icon, setIcon] = React.useState("shapes")
-  const [color, setColor] = React.useState("var(--chart-1)")
+  const [color, setColor] = React.useState("var(--chart-4)")
 
   React.useEffect(() => {
     if (editingCategory) {
@@ -247,7 +285,7 @@ function CategoryModal({
       setName("")
       setKind("expense")
       setIcon("shapes")
-      setColor("var(--chart-1)")
+      setColor("var(--chart-4)")
     }
   }, [editingCategory, open])
 
@@ -266,81 +304,81 @@ function CategoryModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{editingCategory ? "Edit Category" : "Add Custom Category"}</DialogTitle>
-          <DialogDescription>
-            Customize category name, type, icon, and color theme.
-          </DialogDescription>
+          <DialogTitle>{editingCategory ? "Edit category" : "Add custom category"}</DialogTitle>
+          <DialogDescription>Customize name, type, icon, and color.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {/* Kind toggle */}
-          <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1 text-xs">
+          <div className={cn(dashSegment, "grid grid-cols-2 gap-1 p-1")}>
             <button
               type="button"
               onClick={() => setKind("expense")}
-              className={`rounded-md py-1.5 font-medium transition-all ${
-                kind === "expense"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={cn(
+                dashSegmentItem,
+                "w-full",
+                kind === "expense" ? dashSegmentItemActive : "hover:text-[var(--dash-text)]",
+              )}
             >
               Expense
             </button>
             <button
               type="button"
               onClick={() => setKind("income")}
-              className={`rounded-md py-1.5 font-medium transition-all ${
-                kind === "income"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={cn(
+                dashSegmentItem,
+                "w-full",
+                kind === "income" ? dashSegmentItemActive : "hover:text-[var(--dash-text)]",
+              )}
             >
               Income
             </button>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground">Category Name</label>
+            <label className="dash-label">Category name</label>
             <Input
               placeholder="e.g. Subscriptions, Groceries, Freelance"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className={dashInput}
               required
             />
           </div>
 
-          {/* Color Selection */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground">Color Theme</label>
-            <div className="flex items-center gap-2">
+            <label className="dash-label">Color</label>
+            <div className="flex flex-wrap items-center gap-2">
               {CATEGORY_COLOR_CHOICES.map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className={`size-7 rounded-full transition-transform ${
-                    color === c ? "scale-110 ring-2 ring-ring ring-offset-2 ring-offset-background" : ""
-                  }`}
+                  className={cn(
+                    "size-8 rounded-full transition-transform",
+                    color === c ? "scale-110 ring-2 ring-ring ring-offset-2 ring-offset-background" : "",
+                  )}
                   style={{ backgroundColor: c }}
+                  aria-label={`Select color ${c}`}
                 />
               ))}
             </div>
           </div>
 
-          {/* Icon Picker */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground">Icon</label>
-            <div className="grid grid-cols-6 gap-2 max-h-40 overflow-y-auto p-1 rounded-lg border border-border/60">
+            <label className="dash-label">Icon</label>
+            <div className="grid max-h-40 grid-cols-6 gap-2 overflow-y-auto rounded-xl bg-[var(--dash-muted)] p-2">
               {CATEGORY_ICON_CHOICES.map((ic) => (
                 <button
                   key={ic}
                   type="button"
                   onClick={() => setIcon(ic)}
-                  className={`flex size-9 items-center justify-center rounded-lg transition-colors ${
+                  className={cn(
+                    "flex size-9 items-center justify-center rounded-lg transition-colors",
                     icon === ic
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "bg-muted/40 hover:bg-muted text-foreground"
-                  }`}
+                      ? "bg-neutral-900 text-white"
+                      : "bg-[var(--dash-surface)] text-[var(--dash-text)] hover:bg-white",
+                  )}
+                  aria-label={`Select icon ${ic}`}
                 >
                   <Icon name={ic} className="size-4" />
                 </button>
@@ -352,7 +390,9 @@ function CategoryModal({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">{editingCategory ? "Save Category" : "Create Category"}</Button>
+            <Button variant="dash" type="submit">
+              {editingCategory ? "Save category" : "Create category"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

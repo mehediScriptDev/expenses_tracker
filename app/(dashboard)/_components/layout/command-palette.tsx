@@ -105,8 +105,8 @@ export function CommandPalette({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 max-w-lg overflow-hidden border-border/80 shadow-2xl">
-        <div className="flex items-center border-b border-border/60 px-3">
+      <DialogContent className="p-0 max-w-lg overflow-hidden ring-0 shadow-none rounded-xl">
+        <div className="flex items-center px-3">
           <Icon name="search" className="size-4 text-muted-foreground shrink-0" />
           <Input
             placeholder="Type a command or search transactions..."
@@ -133,7 +133,7 @@ export function CommandPalette({
                   onClick={act.perform}
                   className="w-full flex items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-muted/70 transition-colors"
                 >
-                  <span className="flex size-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  <span className="flex size-7 items-center justify-center rounded-md bg-[#D4E4FF] text-[#2B4C7E]">
                     <Icon name={act.icon} className="size-3.5" />
                   </span>
                   <span className="font-medium text-foreground">{act.label}</span>
@@ -211,7 +211,7 @@ export function CommandPalette({
           )}
         </div>
 
-        <div className="border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground flex items-center justify-between">
+        <div className="bg-[#F2EFE9]/70 px-3 py-2 text-[11px] text-muted-foreground flex items-center justify-between">
           <span>Tip: Press <kbd className="rounded bg-muted px-1 font-mono">⌘K</kbd> anywhere to open</span>
           <span className="font-medium">Gorib Manush Quick Search</span>
         </div>

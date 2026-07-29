@@ -152,7 +152,7 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
 
         <form onSubmit={submit} className="flex flex-col gap-4">
           {/* type toggle */}
-          <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#F2EFE9] p-1">
             {(["expense", "income"] as TransactionType[]).map((t) => (
               <button
                 key={t}
@@ -162,11 +162,11 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
                   setForm((f) => ({ ...f, type: t, categoryId: first?.id ?? f.categoryId }))
                 }}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm font-medium capitalize transition-colors",
+                  "rounded-lg px-3 py-1.5 text-sm font-medium capitalize transition-colors",
                   form.type === t
                     ? t === "income"
                       ? "bg-success text-success-foreground"
-                      : "bg-background text-foreground shadow-sm"
+                      : "bg-white text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -281,10 +281,10 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
                     type="button"
                     onClick={() => set("mood", form.mood === m.value ? "none" : m.value)}
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors",
+                      "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm transition-colors",
                       form.mood === m.value
-                        ? "border-transparent bg-primary text-primary-foreground"
-                        : "border-border text-muted-foreground hover:bg-muted",
+                        ? "bg-neutral-900 text-white"
+                        : "bg-[#F2EFE9] text-muted-foreground hover:bg-[#EBE6DE]",
                     )}
                   >
                     <Icon name={m.icon} className="size-3.5" />
@@ -300,12 +300,12 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
             <button
               type="button"
               onClick={() => setShowMore(true)}
-              className="text-left text-sm font-medium text-primary hover:underline"
+              className="text-left text-sm font-medium text-[#2B4C7E] hover:underline"
             >
               + Add merchant, location, tags & notes
             </button>
           ) : (
-            <div className="grid gap-4 rounded-lg border border-border/60 p-3">
+            <div className="grid gap-4 rounded-xl bg-[#F2EFE9] p-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-1.5">
                   <Label htmlFor="merchant">Merchant</Label>
@@ -349,7 +349,7 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
           )}
 
           {/* recurring */}
-          <label className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2">
+          <label className="flex items-center justify-between rounded-xl bg-[#F2EFE9] px-3 py-2">
             <span className="text-sm">
               <span className="font-medium">Recurring</span>
               <span className="block text-xs text-muted-foreground">
@@ -366,7 +366,7 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">{editing ? "Save changes" : "Add"}</Button>
+            <Button type="submit" variant="dash">{editing ? "Save changes" : "Add"}</Button>
           </div>
         </form>
       </DialogContent>

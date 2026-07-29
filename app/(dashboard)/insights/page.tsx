@@ -1,14 +1,32 @@
 "use client"
 
 import * as React from "react"
-import { PageHeader, EmptyState, ProgressBar, CategoryBadge } from "@/dashboard/shared"
+import {
+  PageHeader,
+  EmptyState,
+  ProgressBar,
+  CategoryBadge,
+  DashPage,
+  StatTile,
+  StatGrid,
+  PageHero,
+  DashboardCard,
+  dashMeta,
+} from "@/dashboard/shared"
 import { useStore } from "@/lib/store"
 import { computeInsights, computeWarnings } from "@/lib/insights"
 import { computeDashboard, monthRange, txInRange, sumExpenses, getCategory } from "@/lib/selectors"
 import { formatMoney } from "@/lib/format"
 import { Icon } from "@/lib/icon"
 import { MOODS } from "@/lib/constants"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+
+const insightToneStyles = {
+  danger: { card: "bg-[var(--dash-danger-soft)] ring-[var(--dash-danger-soft)]", icon: "bg-[var(--dash-surface)] text-[var(--dash-expense)]" },
+  warning: { card: "bg-[var(--dash-warning-soft)] ring-[var(--dash-warning-soft)]", icon: "bg-[var(--dash-surface)] text-[#a85a20]" },
+  positive: { card: "bg-[var(--dash-success-soft)] ring-[var(--dash-success-soft)]", icon: "bg-[var(--dash-surface)] text-[var(--dash-income)]" },
+  neutral: { card: "bg-[var(--dash-accent-soft)]/60 ring-[var(--dash-accent-soft)]", icon: "bg-[var(--dash-surface)] text-[var(--dash-accent)]" },
+}
 
 export default function InsightsPage() {
   const { data } = useStore()
@@ -18,7 +36,6 @@ export default function InsightsPage() {
   const warnings = React.useMemo(() => computeWarnings(data, now), [data, now])
   const metrics = React.useMemo(() => computeDashboard(data, now), [data, now])
 
-  // Month expense category breakdown
   const categoryBreakdown = React.useMemo(() => {
     const month = monthRange(now)
     const monthExpenses = txInRange(data.transactions, month).filter((t) => t.type === "expense")
@@ -32,7 +49,14 @@ export default function InsightsPage() {
       map.set(t.categoryId, cur)
     }
 
-    const items: Array<{ categoryId: string; category: ReturnType<typeof getCategory>; total: number; count: number; pct: number }> = []
+    const items: Array<{
+      categoryId: string
+      category: ReturnType<typeof getCategory>
+      total: number
+      count: number
+      pct: number
+    }> = []
+
     for (const [catId, v] of map) {
       const cat = getCategory(data, catId)
       if (cat) {
@@ -48,7 +72,6 @@ export default function InsightsPage() {
     return items.sort((a, b) => b.total - a.total)
   }, [data, now])
 
-  // Mood breakdown
   const moodBreakdown = React.useMemo(() => {
     const month = monthRange(now)
     const monthExpenses = txInRange(data.transactions, month).filter((t) => t.type === "expense" && t.mood)
@@ -74,210 +97,227 @@ export default function InsightsPage() {
     }).sort((a, b) => b.total - a.total)
   }, [data, now])
 
+  const cyclePct = metrics.cycleBudget > 0 ? (metrics.cycleSpending / metrics.cycleBudget) * 100 : 0
+  const alertCount = warnings.length + insights.length
+
   return (
-    <div className="space-y-6">
-        <PageHeader
-          title="Insights & Analytics"
-          description="Automated financial health checks, spending patterns, warnings, and smart recommendations."
+    <DashPage>
+      <PageHeader
+        title="Insights & analytics"
+        description="Automated health checks, spending patterns, and smart recommendations for this cycle."
+      />
+
+      <PageHero
+        label="Safe daily spending limit"
+        value={formatMoney(metrics.safeDailyLimit, { symbol: data.settings.currencySymbol })}
+        caption={
+          <>
+            <strong className="font-semibold text-[var(--dash-text)]">{metrics.daysRemaining} days</strong> left in
+            this salary cycle with{" "}
+            <strong className="font-semibold text-[var(--dash-text)]">
+              {formatMoney(metrics.remainingSalary, { symbol: data.settings.currencySymbol })}
+            </strong>{" "}
+            remaining salary.
+          </>
+        }
+      >
+        <div className="max-w-xl space-y-2">
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="font-medium text-[var(--dash-text-secondary)]">
+              Cycle spending · {formatMoney(metrics.cycleSpending, { symbol: data.settings.currencySymbol })}
+            </span>
+            <span className="font-semibold tabular-nums">{Math.round(cyclePct)}%</span>
+          </div>
+          <ProgressBar
+            value={cyclePct}
+            tone={metrics.remainingSalary <= 0 ? "danger" : metrics.safeDailyLimit < 200 ? "warning" : "accent"}
+            className="h-2.5"
+          />
+          <p className="text-xs text-[var(--dash-text-muted)]">
+            Cycle budget: {formatMoney(metrics.cycleBudget, { symbol: data.settings.currencySymbol })}
+          </p>
+        </div>
+      </PageHero>
+
+      <StatGrid>
+        <StatTile
+          icon="calendar-range"
+          label="This month"
+          value={formatMoney(metrics.monthSpending, { symbol: data.settings.currencySymbol, compact: true })}
         />
+        <StatTile
+          icon="sun"
+          label="Today"
+          value={formatMoney(metrics.todaySpending, { symbol: data.settings.currencySymbol, compact: true })}
+        />
+        <StatTile
+          icon="hand-coins"
+          label="Borrowed"
+          value={formatMoney(metrics.borrowedOutstanding, { symbol: data.settings.currencySymbol, compact: true })}
+          tone={metrics.borrowedOutstanding > 0 ? "danger" : "default"}
+        />
+        <StatTile
+          icon="sparkles"
+          label="Smart alerts"
+          value={alertCount}
+          tone={alertCount > 0 ? "warning" : "success"}
+        />
+      </StatGrid>
 
-        {/* Pacing & Payday Pacing Header Card */}
-        <Card className="border-border/60 bg-linear-to-br from-primary/5 via-background to-card shadow-none">
-          <CardContent className="p-6">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="flex size-7 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <Icon name="gauge" className="size-4" />
+      <DashboardCard
+        title="Smart financial alerts"
+        description="Warnings and recommendations based on your recent activity"
+        action={<span className={dashMeta}>{alertCount} active</span>}
+      >
+        {warnings.length === 0 && insights.length === 0 ? (
+          <EmptyState
+            icon="sparkles"
+            title="Everything looks balanced"
+            message="No critical warnings or unusual spending patterns detected right now."
+            className="bg-transparent py-10"
+          />
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {warnings.map((w) => {
+              const tone = w.tone === "danger" ? "danger" : "warning"
+              const styles = insightToneStyles[tone]
+              return (
+                <article
+                  key={w.id}
+                  className={cn("flex gap-3 rounded-xl p-4 ring-1", styles.card)}
+                >
+                  <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", styles.icon)}>
+                    <Icon name={w.icon} className="size-5" />
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Salary Pacing & Safe Limit
+                  <div className="min-w-0 space-y-1">
+                    <h4 className="text-sm font-semibold text-[var(--dash-text)]">{w.title}</h4>
+                    {w.detail ? <p className="text-xs leading-relaxed text-[var(--dash-text-secondary)]">{w.detail}</p> : null}
+                  </div>
+                </article>
+              )
+            })}
+
+            {insights.map((ins) => {
+              const tone =
+                ins.tone === "positive"
+                  ? "positive"
+                  : ins.tone === "warning"
+                    ? "warning"
+                    : ins.tone === "danger"
+                      ? "danger"
+                      : "neutral"
+              const styles = insightToneStyles[tone]
+
+              return (
+                <article
+                  key={ins.id}
+                  className={cn("flex gap-3 rounded-xl p-4 ring-1", styles.card)}
+                >
+                  <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", styles.icon)}>
+                    <Icon name={ins.icon} className="size-5" />
                   </span>
-                </div>
-                <h2 className="text-2xl font-bold tracking-tight">
-                  {formatMoney(metrics.safeDailyLimit, { symbol: data.settings.currencySymbol })}
-                  <span className="text-base font-normal text-muted-foreground"> / day safe limit</span>
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  You have <strong className="text-foreground">{metrics.daysRemaining} days</strong> remaining in this salary cycle with{" "}
-                  <strong className="text-foreground">{formatMoney(metrics.remainingSalary, { symbol: data.settings.currencySymbol })}</strong> remaining salary.
-                </p>
-              </div>
+                  <div className="min-w-0 space-y-1">
+                    <h4 className="text-sm font-semibold text-[var(--dash-text)]">{ins.title}</h4>
+                    {ins.detail ? (
+                      <p className="text-xs leading-relaxed text-[var(--dash-text-secondary)]">{ins.detail}</p>
+                    ) : null}
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        )}
+      </DashboardCard>
 
-              <div className="space-y-2 sm:w-64">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Spent: {formatMoney(metrics.cycleSpending, { symbol: data.settings.currencySymbol })}</span>
-                  <span className="font-semibold">{Math.round((metrics.cycleSpending / (metrics.cycleBudget || 1)) * 100)}%</span>
-                </div>
-                <ProgressBar
-                  value={(metrics.cycleSpending / (metrics.cycleBudget || 1)) * 100}
-                  tone={metrics.remainingSalary <= 0 ? "danger" : metrics.safeDailyLimit < 200 ? "warning" : "primary"}
-                  className="h-3"
-                />
-                <p className="text-[11px] text-muted-foreground text-right">
-                  Cycle budget: {formatMoney(metrics.cycleBudget, { symbol: data.settings.currencySymbol })}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Warnings & Smart Insights Grid */}
-        <div className="space-y-4">
-          <h3 className="text-base font-semibold tracking-tight">Smart Financial Alerts</h3>
-
-          {warnings.length === 0 && insights.length === 0 ? (
-            <EmptyState
-              icon="sparkles"
-              title="Everything looks balanced!"
-              message="No critical warnings or budget spikes detected for your current spending history."
-            />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <DashboardCard
+          title="Category breakdown"
+          description="Top spending categories this month"
+          action={<span className={dashMeta}>This month</span>}
+        >
+          {categoryBreakdown.length === 0 ? (
+            <p className="py-8 text-center text-sm text-[var(--dash-text-muted)]">No expenses recorded this month.</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
-              {/* Warnings first */}
-              {warnings.map((w) => {
-                const isDanger = w.tone === "danger"
-                return (
-                  <Card
-                    key={w.id}
-                    className={`border-l-4 shadow-none ${
-                      isDanger
-                        ? "border-l-destructive bg-destructive/5"
-                        : "border-l-warning bg-warning/5"
-                    }`}
-                  >
-                    <CardContent className="p-4 flex gap-3">
-                      <span
-                        className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${
-                          isDanger ? "bg-destructive/15 text-destructive" : "bg-warning/15 text-warning"
-                        }`}
-                      >
-                        <Icon name={w.icon} className="size-5" />
-                      </span>
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-semibold">{w.title}</h4>
-                        {w.detail && <p className="text-xs text-muted-foreground">{w.detail}</p>}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-
-              {/* General Insights */}
-              {insights.map((ins) => {
-                const isPos = ins.tone === "positive"
-                const isWarn = ins.tone === "warning"
-                const isDang = ins.tone === "danger"
-
-                return (
-                  <Card
-                    key={ins.id}
-                    className={`border-l-4 shadow-none ${
-                      isPos
-                        ? "border-l-success bg-success/5"
-                        : isWarn
-                        ? "border-l-warning bg-warning/5"
-                        : isDang
-                        ? "border-l-destructive bg-destructive/5"
-                        : "border-l-primary bg-primary/5"
-                    }`}
-                  >
-                    <CardContent className="p-4 flex gap-3">
-                      <span
-                        className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${
-                          isPos
-                            ? "bg-success/15 text-success"
-                            : isWarn
-                            ? "bg-warning/15 text-warning"
-                            : isDang
-                            ? "bg-destructive/15 text-destructive"
-                            : "bg-primary/15 text-primary"
-                        }`}
-                      >
-                        <Icon name={ins.icon} className="size-5" />
-                      </span>
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-semibold">{ins.title}</h4>
-                        {ins.detail && <p className="text-xs text-muted-foreground">{ins.detail}</p>}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+              {categoryBreakdown.slice(0, 6).map((item) => (
+                <article
+                  key={item.categoryId}
+                  className="rounded-xl bg-[var(--dash-surface)] p-4 ring-1 ring-[var(--dash-border)] space-y-3 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <CategoryBadge
+                      icon={item.category?.icon ?? "circle"}
+                      color={item.category?.color ?? "var(--muted)"}
+                      name={item.category?.name}
+                      size="sm"
+                    />
+                    <span className="rounded-md bg-[var(--dash-surface)] px-2 py-0.5 text-xs font-semibold text-[var(--dash-text-muted)]">
+                      {item.count} tx
+                    </span>
+                  </div>
+                  <p className="font-mono text-xl font-bold tabular-nums text-[var(--dash-text)]">
+                    {formatMoney(item.total, { symbol: data.settings.currencySymbol })}
+                  </p>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs text-[var(--dash-text-muted)]">
+                      <span>Share of spending</span>
+                      <span className="font-semibold">{Math.round(item.pct)}%</span>
+                    </div>
+                    <ProgressBar value={item.pct} tone="accent" className="h-2" />
+                  </div>
+                </article>
+              ))}
             </div>
           )}
-        </div>
+        </DashboardCard>
 
-        {/* Analytics Breakdown Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Category Spending Breakdown */}
-          <Card className="border-border/60 shadow-none">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Category Breakdown (This Month)</CardTitle>
-              <CardDescription>Top spending categories ranked by total spent amount.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {categoryBreakdown.length === 0 ? (
-                <p className="py-6 text-center text-xs text-muted-foreground">No expenses recorded this month.</p>
-              ) : (
-                categoryBreakdown.slice(0, 6).map((item) => (
-                  <div key={item.categoryId} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <CategoryBadge
-                        icon={item.category?.icon ?? "circle"}
-                        color={item.category?.color ?? "var(--muted)"}
-                        name={item.category?.name}
-                        size="sm"
-                      />
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">{item.count} tx</span>
-                        <span className="font-semibold">{formatMoney(item.total, { symbol: data.settings.currencySymbol })}</span>
-                      </div>
-                    </div>
-                    <ProgressBar value={item.pct} className="h-2" />
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Emotional / Mood-Based Spending */}
-          <Card className="border-border/60 shadow-none">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Emotional Spending Analysis</CardTitle>
-              <CardDescription>How you felt about your purchases this month.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <DashboardCard
+          title="Emotional spending"
+          description="How you felt about purchases this month"
+          action={<span className={dashMeta}>Mood tags</span>}
+        >
+          <div className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
               {moodBreakdown.map((m) => (
-                <div key={m.value} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="flex size-6 items-center justify-center rounded-full text-white"
-                        style={{ backgroundColor: m.color }}
-                      >
-                        <Icon name={m.icon} className="size-3.5" />
-                      </span>
-                      <span className="font-medium capitalize">{m.label}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">{Math.round(m.pct)}%</span>
-                      <span className="font-semibold">{formatMoney(m.total, { symbol: data.settings.currencySymbol })}</span>
+                <article
+                  key={m.value}
+                  className="rounded-xl bg-[var(--dash-surface)] p-4 ring-1 ring-[var(--dash-border)] space-y-3 shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white"
+                      style={{ backgroundColor: m.color }}
+                    >
+                      <Icon name={m.icon} className="size-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-semibold capitalize text-[var(--dash-text)]">{m.label}</p>
+                      <p className="text-xs text-[var(--dash-text-muted)]">{m.count} tagged purchases</p>
                     </div>
                   </div>
-                  <ProgressBar value={m.pct} tone="primary" className="h-2" />
-                </div>
+                  <p className="font-mono text-xl font-bold tabular-nums text-[var(--dash-text)]">
+                    {formatMoney(m.total, { symbol: data.settings.currencySymbol })}
+                  </p>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs text-[var(--dash-text-muted)]">
+                      <span>Of mood-tagged spend</span>
+                      <span className="font-semibold">{Math.round(m.pct)}%</span>
+                    </div>
+                    <ProgressBar value={m.pct} tone="accent" className="h-2" />
+                  </div>
+                </article>
               ))}
+            </div>
 
-              <div className="mt-4 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
-                <p className="font-medium text-foreground">💡 Senior UX Tip</p>
-                <p className="mt-0.5">
-                  Tracking purchase mood helps identify impulse or regret spending so you can build conscious spending habits.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-    </div>
+            <div className="rounded-xl bg-[var(--dash-muted)] p-4 text-sm">
+              <p className="font-semibold text-[var(--dash-text)]">Tip</p>
+              <p className="mt-1 leading-relaxed text-[var(--dash-text-muted)]">
+                Mood tags help surface impulse or regret spending so you can build more intentional habits over time.
+              </p>
+            </div>
+          </div>
+        </DashboardCard>
+      </div>
+    </DashPage>
   )
 }

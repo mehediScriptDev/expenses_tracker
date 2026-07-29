@@ -1,14 +1,28 @@
 "use client"
 
 import * as React from "react"
-import { PageHeader, EmptyState, ProgressBar } from "@/dashboard/shared"
+import {
+  PageHeader,
+  EmptyState,
+  ProgressBar,
+  dashSegment,
+  dashSegmentItem,
+  dashSegmentItemActive,
+  dashInput,
+  DashPage,
+  StatTile,
+  StatGrid,
+  FilterToolbar,
+  PageHero,
+  StatusBadge,
+  DashboardCard,
+} from "@/dashboard/shared"
 import { useStore } from "@/lib/store"
 import { loanTotals, loanStatus, loanRemaining } from "@/lib/selectors"
 import { formatMoney, relativeDay, todayISO } from "@/lib/format"
 import { Icon } from "@/lib/icon"
 import type { Loan, LoanDirection } from "@/types"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -26,6 +40,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 export default function BorrowedPage() {
   const { data, addLoan, updateLoan, deleteLoan } = useStore()
@@ -42,28 +57,28 @@ export default function BorrowedPage() {
   const [repayAmount, setRepayAmount] = React.useState("")
 
   const totals = React.useMemo(() => loanTotals(data.loans), [data.loans])
+  const netPosition = totals.lentOutstanding - totals.borrowedOutstanding
 
   const filteredLoans = React.useMemo(() => {
-    return data.loans.filter((loan) => {
-      // Direction
-      if (directionTab !== "all" && loan.direction !== directionTab) return false
+    return data.loans
+      .filter((loan) => {
+        if (directionTab !== "all" && loan.direction !== directionTab) return false
 
-      // Search
-      if (search.trim()) {
-        const q = search.toLowerCase().trim()
-        const matchPerson = loan.person.toLowerCase().includes(q)
-        const matchReason = loan.reason?.toLowerCase().includes(q)
-        if (!matchPerson && !matchReason) return false
-      }
+        if (search.trim()) {
+          const q = search.toLowerCase().trim()
+          const matchPerson = loan.person.toLowerCase().includes(q)
+          const matchReason = loan.reason?.toLowerCase().includes(q)
+          if (!matchPerson && !matchReason) return false
+        }
 
-      // Status
-      const status = loanStatus(loan)
-      if (statusFilter === "unpaid" && (status === "paid")) return false
-      if (statusFilter === "overdue" && status !== "overdue") return false
-      if (statusFilter === "paid" && status !== "paid") return false
+        const status = loanStatus(loan)
+        if (statusFilter === "unpaid" && status === "paid") return false
+        if (statusFilter === "overdue" && status !== "overdue") return false
+        if (statusFilter === "paid" && status !== "paid") return false
 
-      return true
-    }).sort((a, b) => b.createdAt - a.createdAt)
+        return true
+      })
+      .sort((a, b) => b.createdAt - a.createdAt)
   }, [data.loans, directionTab, statusFilter, search])
 
   const handleOpenAdd = () => {
@@ -78,8 +93,7 @@ export default function BorrowedPage() {
 
   const handleOpenRepay = (loan: Loan) => {
     setTargetLoan(loan)
-    const remaining = loanRemaining(loan)
-    setRepayAmount(String(remaining))
+    setRepayAmount(String(loanRemaining(loan)))
     setRepayModalOpen(true)
   }
 
@@ -99,295 +113,298 @@ export default function BorrowedPage() {
   }
 
   return (
-    <div className="space-y-6">
-        <PageHeader
-          title="Borrowed & Lent"
-          description="Keep track of money you've borrowed from or lent to family, friends, or institutions."
-        >
-          <Button onClick={handleOpenAdd} className="gap-1.5">
-            <Icon name="plus" className="size-4" />
-            Add Loan / Debt
-          </Button>
-        </PageHeader>
+    <DashPage>
+      <PageHeader
+        title="Borrowed & lent"
+        description="Track money you owe and money others owe you, with due dates and repayment progress."
+      >
+        <Button variant="dash" onClick={handleOpenAdd} className="gap-1.5">
+          <Icon name="plus" className="size-4" />
+          Add record
+        </Button>
+      </PageHeader>
 
-        {/* Top Summary Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Card className="bg-card/50 shadow-none">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Outstanding Borrowed (I owe)</p>
-              <p className="mt-1 text-xl font-bold text-destructive">
-                {formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol })}
-              </p>
-            </CardContent>
-          </Card>
+      <PageHero
+        label="Net position"
+        value={formatMoney(netPosition, { symbol: data.settings.currencySymbol, sign: true })}
+        caption={
+          <>
+            You owe{" "}
+            <strong className="font-semibold text-destructive">
+              {formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol })}
+            </strong>{" "}
+            · Others owe you{" "}
+            <strong className="font-semibold text-success">
+              {formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol })}
+            </strong>
+          </>
+        }
+      >
+        <div className="max-w-xl space-y-2">
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="font-medium text-[var(--dash-text-secondary)]">Overall repayment progress</span>
+            <span className="font-semibold tabular-nums">{Math.round(totals.repaymentPct)}%</span>
+          </div>
+          <ProgressBar value={totals.repaymentPct} tone="accent" className="h-2.5" />
+        </div>
+      </PageHero>
 
-          <Card className="bg-card/50 shadow-none">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Outstanding Lent (Owed to me)</p>
-              <p className="mt-1 text-xl font-bold text-success">
-                {formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol })}
-              </p>
-            </CardContent>
-          </Card>
+      <StatGrid>
+        <StatTile
+          icon="arrow-down-left"
+          label="I owe"
+          value={formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol })}
+          tone="danger"
+        />
+        <StatTile
+          icon="arrow-up-right"
+          label="Owed to me"
+          value={formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol })}
+          tone="success"
+        />
+        <StatTile
+          icon="clock-alert"
+          label="Overdue"
+          value={totals.overdue.length}
+          subtext={totals.overdue.length === 1 ? "item needs attention" : "items need attention"}
+          tone={totals.overdue.length > 0 ? "danger" : "default"}
+        />
+        <StatTile icon="hand-coins" label="Total records" value={data.loans.length} />
+      </StatGrid>
 
-          <Card className="bg-card/50 shadow-none">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Overdue Debts</p>
-              <p className={`mt-1 text-xl font-bold ${totals.overdue.length > 0 ? "text-destructive" : "text-foreground"}`}>
-                {totals.overdue.length} {totals.overdue.length === 1 ? "item" : "items"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 shadow-none">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Repayment Progress</p>
-              <p className="mt-1 text-xl font-bold text-foreground">
-                {Math.round(totals.repaymentPct)}%
-              </p>
-            </CardContent>
-          </Card>
+      <FilterToolbar>
+        <div className={cn(dashSegment, "w-full bg-[var(--dash-surface)] lg:w-auto")}>
+          {(["all", "borrowed", "lent"] as const).map((dir) => (
+            <button
+              key={dir}
+              type="button"
+              onClick={() => setDirectionTab(dir)}
+              className={cn(
+                dashSegmentItem,
+                directionTab === dir ? dashSegmentItemActive : "hover:text-[var(--dash-text)]",
+              )}
+            >
+              {dir === "all" ? "All" : dir === "borrowed" ? "I owe" : "Owed to me"}
+            </button>
+          ))}
         </div>
 
-        {/* Filter Controls Bar */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-1 rounded-lg bg-muted p-1 text-xs">
-            {(["all", "borrowed", "lent"] as const).map((dir) => (
-              <button
-                key={dir}
-                onClick={() => setDirectionTab(dir)}
-                className={`rounded-md px-3 py-1.5 font-medium capitalize transition-all ${
-                  directionTab === dir
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {dir === "all" ? "All Records" : dir === "borrowed" ? "Borrowed (I Owe)" : "Lent (Owed to Me)"}
-              </button>
-            ))}
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
+          <div className="relative min-w-0 flex-1 sm:w-56">
+            <Icon
+              name="search"
+              className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--dash-text-faint)]"
+            />
+            <Input
+              placeholder="Search person or reason..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={cn(dashInput, "border-0 bg-[var(--dash-surface)] pl-10 shadow-none")}
+            />
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 sm:w-64">
-              <Icon name="search" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+            className="dash-input w-full px-3 text-sm sm:w-auto"
+          >
+            <option value="all">All statuses</option>
+            <option value="unpaid">Outstanding</option>
+            <option value="overdue">Overdue</option>
+            <option value="paid">Settled</option>
+          </select>
+        </div>
+      </FilterToolbar>
+
+      {filteredLoans.length === 0 ? (
+        <EmptyState
+          icon="hand-coins"
+          title="No loan records found"
+          message={
+            data.loans.length === 0
+              ? "Start tracking borrowed or lent money with due dates and repayment history."
+              : "No records match your current filters."
+          }
+          action={<Button variant="dash" onClick={handleOpenAdd}>Add record</Button>}
+        />
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {filteredLoans.map((loan) => {
+            const status = loanStatus(loan)
+            const remaining = loanRemaining(loan)
+            const pct = loan.amount > 0 ? (loan.amountRepaid / loan.amount) * 100 : 100
+            const isBorrowed = loan.direction === "borrowed"
+
+            return (
+              <DashboardCard
+                key={loan.id}
+                title={loan.person}
+                description={loan.reason || "No reason provided"}
+                action={
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      render={
+                        <Button variant="ghost" size="icon" className="size-8 text-[var(--dash-text-muted)]">
+                          <Icon name="ellipsis-vertical" className="size-4" />
+                        </Button>
+                      }
+                    />
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleOpenEdit(loan)}>
+                        <Icon name="pencil" className="size-4" />
+                        Edit details
+                      </DropdownMenuItem>
+                      {status !== "paid" ? (
+                        <DropdownMenuItem onClick={() => handleQuickSettle(loan)}>
+                          <Icon name="check-check" className="size-4" />
+                          Mark settled
+                        </DropdownMenuItem>
+                      ) : null}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem variant="destructive" onClick={() => deleteLoan(loan.id)}>
+                        <Icon name="trash-2" className="size-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                }
+                bodyClassName="space-y-4"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge tone={isBorrowed ? "danger" : "success"} icon={isBorrowed ? "arrow-down-left" : "arrow-up-right"}>
+                    {isBorrowed ? "Borrowed" : "Lent"}
+                  </StatusBadge>
+                  {status === "overdue" ? (
+                    <StatusBadge tone="danger" icon="clock-alert">
+                      Overdue
+                    </StatusBadge>
+                  ) : null}
+                  {status === "paid" ? (
+                    <StatusBadge tone="success" icon="circle-check">
+                      Settled
+                    </StatusBadge>
+                  ) : null}
+                </div>
+
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                      Total
+                    </p>
+                    <p className="mt-1 font-mono text-2xl font-bold tabular-nums text-[var(--dash-text)]">
+                      {formatMoney(loan.amount, { symbol: data.settings.currencySymbol })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                      {status === "paid" ? "Status" : "Remaining"}
+                    </p>
+                    <p
+                      className={cn(
+                        "mt-1 font-mono text-lg font-bold tabular-nums",
+                        status === "paid" ? "text-success" : "text-[var(--dash-text)]",
+                      )}
+                    >
+                      {status === "paid"
+                        ? "Paid in full"
+                        : formatMoney(remaining, { symbol: data.settings.currencySymbol })}
+                    </p>
+                  </div>
+                </div>
+
+                <ProgressBar
+                  value={pct}
+                  tone={status === "paid" ? "success" : status === "overdue" ? "danger" : "accent"}
+                  className="h-2.5"
+                />
+
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--dash-text-muted)]">
+                  <span>Started {loan.date}</span>
+                  {loan.dueDate ? (
+                    <span className={status === "overdue" ? "font-semibold text-destructive" : ""}>
+                      Due {relativeDay(loan.dueDate)} ({loan.dueDate})
+                    </span>
+                  ) : (
+                    <span>No due date</span>
+                  )}
+                </div>
+
+                {status !== "paid" ? (
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 flex-1 gap-1.5 text-xs"
+                      onClick={() => handleOpenRepay(loan)}
+                    >
+                      <Icon name="hand-coins" className="size-3.5" />
+                      Record payment
+                    </Button>
+                    <Button variant="dash" size="sm" className="h-9 text-xs" onClick={() => handleQuickSettle(loan)}>
+                      Settle
+                    </Button>
+                  </div>
+                ) : null}
+              </DashboardCard>
+            )
+          })}
+        </div>
+      )}
+
+      <LoanDialog
+        open={loanModalOpen}
+        onOpenChange={setLoanModalOpen}
+        editingLoan={editingLoan}
+        currencySymbol={data.settings.currencySymbol}
+        onSave={(loanData) => {
+          if (editingLoan) {
+            updateLoan(editingLoan.id, loanData)
+          } else {
+            addLoan(loanData)
+          }
+          setLoanModalOpen(false)
+        }}
+      />
+
+      <Dialog open={repayModalOpen} onOpenChange={setRepayModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Record payment for {targetLoan?.person}</DialogTitle>
+            <DialogDescription>Enter the amount paid toward this record.</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveRepayment} className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="dash-label">Payment amount ({data.settings.currencySymbol})</label>
               <Input
-                placeholder="Search person or reason..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 h-9 text-xs"
+                type="number"
+                step="any"
+                value={repayAmount}
+                onChange={(e) => setRepayAmount(e.target.value)}
+                placeholder="Enter amount"
+                className={dashInput}
+                required
+                autoFocus
               />
+              {targetLoan ? (
+                <p className="dash-caption">
+                  Outstanding: {formatMoney(loanRemaining(targetLoan), { symbol: data.settings.currencySymbol })}
+                </p>
+              ) : null}
             </div>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-            >
-              <option value="all">All Statuses</option>
-              <option value="unpaid">Outstanding Only</option>
-              <option value="overdue">Overdue Only</option>
-              <option value="paid">Settled Only</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Loan Cards List */}
-        {filteredLoans.length === 0 ? (
-          <EmptyState
-            icon="hand-coins"
-            title="No loan or debt records found"
-            message={
-              data.loans.length === 0
-                ? "You haven't added any borrowed or lent money records yet."
-                : "No items match your active filter criteria."
-            }
-            action={<Button onClick={handleOpenAdd}>Add New Record</Button>}
-          />
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {filteredLoans.map((loan) => {
-              const status = loanStatus(loan)
-              const remaining = loanRemaining(loan)
-              const pct = loan.amount > 0 ? (loan.amountRepaid / loan.amount) * 100 : 100
-              const isBorrowed = loan.direction === "borrowed"
-
-              return (
-                <Card key={loan.id} className="border-border/60 shadow-none">
-                  <CardContent className="p-5 space-y-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="space-y-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold ${
-                              isBorrowed
-                                ? "bg-destructive/10 text-destructive"
-                                : "bg-success/10 text-success"
-                            }`}
-                          >
-                            <Icon name={isBorrowed ? "arrow-down-left" : "arrow-up-right"} className="size-3.5" />
-                            {isBorrowed ? "Borrowed" : "Lent"}
-                          </span>
-
-                          {status === "overdue" && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-destructive/15 px-2 py-0.5 text-xs font-semibold text-destructive">
-                              <Icon name="clock-alert" className="size-3" />
-                              Overdue
-                            </span>
-                          )}
-
-                          {status === "paid" && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
-                              <Icon name="circle-check" className="size-3" />
-                              Settled
-                            </span>
-                          )}
-                        </div>
-
-                        <h3 className="text-base font-semibold truncate">{loan.person}</h3>
-                        {loan.reason && (
-                          <p className="text-xs text-muted-foreground truncate">{loan.reason}</p>
-                        )}
-                      </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          render={
-                            <Button variant="ghost" size="icon" className="size-8 text-muted-foreground">
-                              <Icon name="ellipsis-vertical" className="size-4" />
-                            </Button>
-                          }
-                        />
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleOpenEdit(loan)}>
-                            <Icon name="pencil" className="size-4" />
-                            Edit Details
-                          </DropdownMenuItem>
-                          {status !== "paid" && (
-                            <DropdownMenuItem onClick={() => handleQuickSettle(loan)}>
-                              <Icon name="check-check" className="size-4" />
-                              Mark Fully Settled
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem variant="destructive" onClick={() => deleteLoan(loan.id)}>
-                            <Icon name="trash-2" className="size-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-baseline justify-between text-xs">
-                        <span className="text-muted-foreground">Total: {formatMoney(loan.amount, { symbol: data.settings.currencySymbol })}</span>
-                        <span className="font-semibold text-foreground">
-                          {status === "paid"
-                            ? "Paid in Full"
-                            : `Remaining: ${formatMoney(remaining, { symbol: data.settings.currencySymbol })}`}
-                        </span>
-                      </div>
-
-                      <ProgressBar
-                        value={pct}
-                        tone={status === "paid" ? "success" : status === "overdue" ? "danger" : "primary"}
-                        className="h-2"
-                      />
-
-                      <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1">
-                        <span>Date: {loan.date}</span>
-                        {loan.dueDate && (
-                          <span className={status === "overdue" ? "text-destructive font-medium" : ""}>
-                            Due: {relativeDay(loan.dueDate)} ({loan.dueDate})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {status !== "paid" && (
-                      <div className="pt-1 flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 text-xs gap-1.5 h-8"
-                          onClick={() => handleOpenRepay(loan)}
-                        >
-                          <Icon name="hand-coins" className="size-3.5" />
-                          Record Payment
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="text-xs h-8"
-                          onClick={() => handleQuickSettle(loan)}
-                        >
-                          Settle
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        )}
-
-        {/* Add/Edit Loan Dialog */}
-        <LoanDialog
-          open={loanModalOpen}
-          onOpenChange={setLoanModalOpen}
-          editingLoan={editingLoan}
-          currencySymbol={data.settings.currencySymbol}
-          onSave={(loanData) => {
-            if (editingLoan) {
-              updateLoan(editingLoan.id, loanData)
-            } else {
-              addLoan(loanData)
-            }
-            setLoanModalOpen(false)
-          }}
-        />
-
-        {/* Repayment Dialog */}
-        <Dialog open={repayModalOpen} onOpenChange={setRepayModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Record Payment for {targetLoan?.person}</DialogTitle>
-              <DialogDescription>
-                Enter the amount paid towards this debt record.
-              </DialogDescription>
-            </DialogHeader>
-
-            <form onSubmit={handleSaveRepayment} className="space-y-4 py-2">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Payment Amount ({data.settings.currencySymbol})
-                </label>
-                <Input
-                  type="number"
-                  step="any"
-                  value={repayAmount}
-                  onChange={(e) => setRepayAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  required
-                  autoFocus
-                />
-                {targetLoan && (
-                  <p className="text-[11px] text-muted-foreground">
-                    Current outstanding: {formatMoney(loanRemaining(targetLoan), { symbol: data.settings.currencySymbol })}
-                  </p>
-                )}
-              </div>
-
-              <DialogFooter className="pt-2">
-                <Button type="button" variant="outline" onClick={() => setRepayModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">Record Payment</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-    </div>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setRepayModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="dash" type="submit">
+                Record payment
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </DashPage>
   )
 }
 
@@ -457,108 +474,96 @@ function LoanDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{editingLoan ? "Edit Loan Details" : "Add Borrowed / Lent Record"}</DialogTitle>
-          <DialogDescription>
-            Track money taken from or given to family, friends, or lenders.
-          </DialogDescription>
+          <DialogTitle>{editingLoan ? "Edit loan details" : "Add borrowed / lent record"}</DialogTitle>
+          <DialogDescription>Track money taken from or given to others.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {/* Direction toggle */}
-          <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1 text-xs">
+          <div className={cn(dashSegment, "grid grid-cols-2 gap-1 p-1")}>
             <button
               type="button"
               onClick={() => setDirection("borrowed")}
-              className={`rounded-md py-2 font-semibold transition-all ${
-                direction === "borrowed"
-                  ? "bg-background text-destructive shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={cn(
+                dashSegmentItem,
+                direction === "borrowed" ? "bg-[var(--dash-surface)] font-semibold text-destructive" : "",
+              )}
             >
-              Borrowed (I Owe)
+              I owe
             </button>
             <button
               type="button"
               onClick={() => setDirection("lent")}
-              className={`rounded-md py-2 font-semibold transition-all ${
-                direction === "lent"
-                  ? "bg-background text-success shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={cn(
+                dashSegmentItem,
+                direction === "lent" ? "bg-[var(--dash-surface)] font-semibold text-success" : "",
+              )}
             >
-              Lent (Owed to Me)
+              Owed to me
             </button>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground">Person or Entity Name</label>
+            <label className="dash-label">Person or entity</label>
             <Input
               placeholder="e.g. Rahim, Uncle, Brac Bank"
               value={person}
               onChange={(e) => setPerson(e.target.value)}
+              className={dashInput}
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Total Amount ({currencySymbol})</label>
+              <label className="dash-label">Total ({currencySymbol})</label>
               <Input
                 type="number"
                 step="any"
                 placeholder="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                className={dashInput}
                 required
               />
             </div>
-
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Amount Already Repaid</label>
+              <label className="dash-label">Already repaid</label>
               <Input
                 type="number"
                 step="any"
                 placeholder="0"
                 value={amountRepaid}
                 onChange={(e) => setAmountRepaid(e.target.value)}
+                className={dashInput}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Date Taken/Given</label>
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-              />
+              <label className="dash-label">Date</label>
+              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={dashInput} required />
             </div>
-
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Due Date (Optional)</label>
-              <Input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
+              <label className="dash-label">Due date (optional)</label>
+              <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={dashInput} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground">Reason / Purpose</label>
+            <label className="dash-label">Reason</label>
             <Input
-              placeholder="e.g. Emergency medical expenses, rent gap"
+              placeholder="e.g. Emergency medical, rent gap"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
+              className={dashInput}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground">Additional Notes</label>
+            <label className="dash-label">Notes</label>
             <Textarea
-              placeholder="Any details or reminder notes..."
+              placeholder="Any reminder notes..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
@@ -569,7 +574,9 @@ function LoanDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">{editingLoan ? "Save Changes" : "Create Record"}</Button>
+            <Button variant="dash" type="submit">
+              {editingLoan ? "Save changes" : "Create record"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

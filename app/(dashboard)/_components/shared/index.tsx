@@ -2,21 +2,48 @@ import * as React from "react"
 import { Icon } from "@/lib/icon"
 import { cn } from "@/lib/utils"
 
+export {
+  DashboardCard,
+  dashCard,
+  dashMuted,
+  dashSegment,
+  dashSegmentItem,
+  dashSegmentItemActive,
+  dashLabel,
+  dashCaption,
+  dashMeta,
+  dashLink,
+  dashInput,
+  dashStatValue,
+  dashHeroValue,
+  dashSectionTitle,
+} from "./dashboard-card"
+
+export {
+  StatTile,
+  StatGrid,
+  FilterToolbar,
+  DateGroupHeader,
+  StatusBadge,
+  PageHero,
+} from "./page-primitives"
+
 /* ------------------------- ProgressBar ------------------------- */
 
-export type Tone = "primary" | "success" | "warning" | "danger" | "muted"
+export type Tone = "primary" | "accent" | "success" | "warning" | "danger" | "muted"
 
 const toneBar: Record<Tone, string> = {
-  primary: "bg-primary",
-  success: "bg-success",
+  primary: "bg-[#141414]",
+  accent: "bg-[var(--dash-progress)]",
+  success: "bg-[var(--dash-income)]",
   warning: "bg-warning",
-  danger: "bg-destructive",
-  muted: "bg-muted-foreground/40",
+  danger: "bg-[var(--dash-expense)]",
+  muted: "bg-[var(--dash-text-faint)]",
 }
 
 export function ProgressBar({
   value,
-  tone = "primary",
+  tone = "accent",
   className,
   trackClassName,
 }: {
@@ -28,7 +55,7 @@ export function ProgressBar({
   const pct = Math.max(0, Math.min(100, value))
   return (
     <div
-      className={cn("h-2 w-full overflow-hidden rounded-full bg-muted", trackClassName, className)}
+      className={cn("h-2.5 w-full overflow-hidden rounded-full bg-(--dash-muted) ring-1 ring-(--dash-border)", trackClassName, className)}
       role="progressbar"
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
@@ -60,17 +87,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 px-6 py-14 text-center",
+        "flex flex-col items-center justify-center gap-4 rounded-xl bg-[var(--dash-accent-soft)]/35 px-6 py-14 text-center ring-1 ring-[var(--dash-border)]",
         className,
       )}
     >
-      <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Icon name={icon} className="size-6" />
+      <div className="flex size-14 items-center justify-center rounded-full bg-[var(--dash-surface)] text-[var(--dash-accent)] shadow-sm ring-1 ring-[var(--dash-border)]">
+        <Icon name={icon} className="size-7" />
       </div>
-      <div className="space-y-1">
-        <p className="font-medium text-balance">{title}</p>
+      <div className="space-y-2">
+        <p className="text-base font-semibold text-[var(--dash-text)] text-balance">{title}</p>
         {message ? (
-          <p className="mx-auto max-w-xs text-sm text-muted-foreground text-pretty">{message}</p>
+          <p className="mx-auto max-w-sm text-sm leading-relaxed text-[var(--dash-text-secondary)] text-pretty">{message}</p>
         ) : null}
       </div>
       {action}
@@ -90,16 +117,26 @@ export function PageHeader({
   children?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-balance">{title}</h1>
-        {description ? (
-          <p className="mt-0.5 text-sm text-muted-foreground text-pretty">{description}</p>
-        ) : null}
+    <div className="dash-page-header flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="dash-page-title">{title}</h1>
+        {description ? <p className="dash-page-desc">{description}</p> : null}
       </div>
-      {children ? <div className="flex items-center gap-2">{children}</div> : null}
+      {children ? (
+        <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">{children}</div>
+      ) : null}
     </div>
   )
+}
+
+export function DashPage({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return <div className={cn("dash-page", className)}>{children}</div>
 }
 
 /* ------------------------- CategoryDot ------------------------- */
@@ -115,17 +152,20 @@ export function CategoryBadge({
   name?: string
   size?: "sm" | "md" | "lg"
 }) {
-  const box = size === "sm" ? "size-7" : size === "lg" ? "size-11" : "size-9"
-  const ic = size === "sm" ? "size-3.5" : size === "lg" ? "size-5" : "size-4"
+  const box = size === "sm" ? "size-8" : size === "lg" ? "size-11" : "size-9"
+  const ic = size === "sm" ? "size-4" : size === "lg" ? "size-5" : "size-4"
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex items-center gap-2.5">
       <span
-        className={cn("inline-flex items-center justify-center rounded-lg", box)}
-        style={{ backgroundColor: `color-mix(in oklch, ${color} 16%, transparent)`, color }}
+        className={cn("inline-flex items-center justify-center rounded-lg ring-1 ring-black/5", box)}
+        style={{
+          backgroundColor: `color-mix(in oklch, ${color} 32%, white)`,
+          color: `color-mix(in oklch, ${color} 85%, black)`,
+        }}
       >
         <Icon name={icon} className={ic} />
       </span>
-      {name ? <span className="font-medium">{name}</span> : null}
+      {name ? <span className="text-sm font-semibold text-[var(--dash-text)]">{name}</span> : null}
     </span>
   )
 }

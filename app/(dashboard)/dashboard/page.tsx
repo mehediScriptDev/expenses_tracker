@@ -1,29 +1,30 @@
 "use client"
 
-import { HeroCard } from "@/dashboard/dashboard/hero-card"
-import { StatCards } from "@/dashboard/dashboard/stat-cards"
+import { OverviewPanel } from "@/dashboard/dashboard/overview-panel"
 import { QuickAddBar } from "@/dashboard/quick-add-bar"
 import { WarningsBanner } from "@/dashboard/dashboard/warnings-banner"
 import { CategoryBreakdown } from "@/dashboard/dashboard/category-breakdown"
 import { BorrowedSummary } from "@/dashboard/dashboard/borrowed-summary"
 import { RecentTransactions } from "@/dashboard/dashboard/recent-transactions"
+import { DashPage } from "@/dashboard/shared"
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8 w-full">
-      <HeroCard />
-      <StatCards />
-      <QuickAddBar />
-      <WarningsBanner />
+    <DashPage>
+      <OverviewPanel />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="grid gap-6 xl:grid-cols-12">
+        <div className="space-y-6 xl:col-span-8">
           <CategoryBreakdown />
+          <RecentTransactions />
         </div>
-        <BorrowedSummary />
-      </div>
 
-      <RecentTransactions />
-    </div>
+        <aside className="space-y-6 xl:col-span-4 xl:sticky xl:top-18 xl:self-start">
+          <QuickAddBar />
+          <WarningsBanner />
+          <BorrowedSummary />
+        </aside>
+      </div>
+    </DashPage>
   )
 }

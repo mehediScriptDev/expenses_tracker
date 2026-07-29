@@ -1,4 +1,4 @@
-import { DEFAULT_CATEGORIES } from "./constants"
+import { DEFAULT_CATEGORIES, DEFAULT_QUICK_ADD_PRESETS } from "./constants"
 import { toISODate } from "./format"
 import type { AppData, Loan, Transaction } from "@/types"
 
@@ -149,6 +149,7 @@ export function buildSeedData(): AppData {
     transactions: transactions.sort((a, b) => b.createdAt - a.createdAt),
     loans,
     budgets,
+    quickAddPresets: DEFAULT_QUICK_ADD_PRESETS.map((p) => ({ ...p })),
   }
 }
 
@@ -160,5 +161,6 @@ export function emptyData(): AppData {
     transactions: [],
     loans: [],
     budgets: {},
+    quickAddPresets: DEFAULT_QUICK_ADD_PRESETS.map((p) => ({ ...p })),
   }
 }

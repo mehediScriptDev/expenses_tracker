@@ -8,7 +8,7 @@ export const MAIN_NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: "layout-dashboard" },
   { href: "/transactions", label: "Transactions", icon: "receipt-text" },
   { href: "/budgets", label: "Budgets", icon: "target" },
-  { href: "/goals", label: "Savings Goals", icon: "trophy" },
+  { href: "/goals", label: "Goals", icon: "trophy" },
   { href: "/borrowed", label: "Borrowed", icon: "hand-coins" },
   { href: "/insights", label: "Insights", icon: "sparkles" },
   { href: "/categories", label: "Categories", icon: "shapes" },

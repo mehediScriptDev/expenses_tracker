@@ -53,7 +53,7 @@ function UserMenu() {
       <button
         onClick={() => setOpen(!open)}
         aria-label="User Menu"
-        className="flex h-9 items-center gap-1 rounded-full border border-neutral-300 bg-[#EBF3FA] px-3 font-mono font-bold text-xs text-[#2B4C7E] shadow-2xs hover:bg-[#DEEBF7] transition-all cursor-pointer"
+        className="flex h-9 items-center gap-1 rounded-full bg-[#EBF3FA] px-3 font-mono font-bold text-xs text-[#2B4C7E] hover:bg-[#DEEBF7] transition-all cursor-pointer"
       >
         <span>AA</span>
         <Icon name={open ? "chevron-up" : "chevron-down"} className="size-3 text-[#2B4C7E]" />
@@ -61,7 +61,7 @@ function UserMenu() {
 
       {open && (
         <div 
-          className="absolute right-0 mt-2 w-52 rounded-md border border-neutral-300 bg-white p-4 shadow-lg z-50 font-mono text-xs text-neutral-800 text-left animate-in fade-in zoom-in-95 duration-100"
+          className="absolute right-0 mt-2 w-52 rounded-xl bg-white p-4 z-50 font-mono text-xs text-neutral-800 text-left animate-in fade-in zoom-in-95 duration-100"
           onMouseLeave={() => setOpen(false)}
         >
           <div className="space-y-3">
@@ -144,7 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 text-sm font-semibold transition-all rounded-tl-lg rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
                     active
-                      ? "bg-[#FFC700] text-black font-extrabold"
+                      ? "bg-[#FFC700] text-neutral-900 font-extrabold"
                       : "text-neutral-600 dark:text-muted-foreground hover:bg-white dark:hover:bg-muted hover:text-neutral-900 dark:hover:text-foreground",
                   )}
                 >
@@ -156,9 +156,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Sidebar footer tip */}
-          <div className="mt-auto rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-muted p-3 space-y-1">
-            <p className="text-xs font-extrabold text-neutral-800 dark:text-foreground">Spend with intention</p>
-            <p className="text-[11px] text-neutral-500 dark:text-muted-foreground text-pretty leading-relaxed">
+          <div className="mt-auto rounded-xl bg-white dark:bg-muted p-3 space-y-1">
+            <p className="text-sm font-bold text-[#1A1A1A] dark:text-foreground">Spend with intention</p>
+            <p className="text-sm leading-relaxed text-[#5C5955] dark:text-muted-foreground text-pretty">
               Every taka you track is a step toward financial calm.
             </p>
           </div>
@@ -172,7 +172,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="lg:hidden">
                 <Brand />
               </span>
-              <h1 className="hidden font-serif text-base font-extrabold text-neutral-900 dark:text-foreground lg:block">
+              <h1 className="hidden text-lg font-bold text-[#1A1A1A] dark:text-foreground lg:block">
                 {activeLabel}
               </h1>
             </div>
@@ -182,28 +182,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          <main className="w-full px-4 pb-28 pt-6 sm:px-8 lg:px-10 lg:pb-10">
+          <main className="w-full px-4 pb-24 pt-6 sm:px-8 lg:px-10 lg:pb-10">
             {hydrated ? children : <LoadingScreen />}
           </main>
         </div>
 
         {/* ── Bottom nav (mobile) ── */}
-        <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3]/95 dark:bg-background/95 px-2 py-1.5 backdrop-blur-md lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3]/95 dark:bg-background/95 px-2 py-2.5 backdrop-blur-md lg:hidden">
           {MOBILE_NAV.map((item) => {
             const active = item.href === pathname
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-0.5 px-1 py-1.5 text-[11px] font-semibold transition-colors rounded-tl-lg rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
+                  "flex flex-1 items-center justify-center px-2 py-3 transition-colors rounded-tl-lg rounded-tr-[12px] rounded-br-none rounded-bl-[14px]",
                   active
-                    ? "text-black bg-[#FFC700] font-bold"
-                    : "text-neutral-500 dark:text-muted-foreground",
+                    ? "bg-[#FFC700] text-neutral-900"
+                    : "text-[#5C5955] dark:text-muted-foreground",
                 )}
               >
                 <Icon name={item.icon} className="size-5" />
-                {item.label}
               </Link>
             )
           })}

@@ -1,12 +1,21 @@
 "use client"
 
 import * as React from "react"
-import { PageHeader } from "@/dashboard/shared"
+import {
+  PageHeader,
+  dashCard,
+  dashLabel,
+  dashCaption,
+  dashInput,
+  DashPage,
+  DashboardCard,
+  dashMuted,
+} from "@/dashboard/shared"
+import { QuickAddPresetsManager } from "@/dashboard/quick-add-presets-manager"
 import { useStore } from "@/lib/store"
 import { Icon } from "@/lib/icon"
 import type { AppData } from "@/types"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
   Dialog,
@@ -17,6 +26,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 const CURRENCIES = [
   { symbol: "৳", name: "BDT — Bangladeshi Taka" },
@@ -29,6 +39,35 @@ const CURRENCIES = [
   { symbol: "AED", name: "AED — UAE Dirham" },
   { symbol: "SAR", name: "SAR — Saudi Riyal" },
 ]
+
+function SettingsSection({
+  icon,
+  title,
+  description,
+  children,
+  className,
+}: {
+  icon: string
+  title: string
+  description?: string
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <DashboardCard
+      title={title}
+      description={description}
+      className={className}
+      action={
+        <span className="flex size-9 items-center justify-center rounded-lg bg-[var(--dash-accent-soft)] text-[var(--dash-accent)]">
+          <Icon name={icon} className="size-4" aria-hidden />
+        </span>
+      }
+    >
+      {children}
+    </DashboardCard>
+  )
+}
 
 export default function SettingsPage() {
   const { data, updateSettings, replaceAll, resetAll, loadDemo } = useStore()
@@ -58,7 +97,7 @@ export default function SettingsPage() {
       currencySymbol,
       currency,
     })
-    toast.success("Financial profile settings saved!")
+    toast.success("Financial profile saved!")
   }
 
   const handleExportData = () => {
@@ -70,7 +109,7 @@ export default function SettingsPage() {
       a.download = `gorib-manush-backup-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
-      toast.success("Backup downloaded successfully!")
+      toast.success("Backup downloaded!")
     } catch {
       toast.error("Failed to export backup.")
     }
@@ -96,198 +135,200 @@ export default function SettingsPage() {
     reader.readAsText(file)
   }
 
+  const stats = [
+    { label: "Transactions", value: data.transactions.length, icon: "receipt-text" },
+    { label: "Categories", value: data.categories.length, icon: "shapes" },
+    { label: "Budgets", value: Object.keys(data.budgets).length, icon: "target" },
+    { label: "Loans", value: data.loans.length, icon: "hand-coins" },
+  ]
+
   return (
-    <div className="space-y-6 max-w-4xl">
-        <PageHeader
-          title="Settings"
-          description="Manage financial setup, currency, and data backup & restore."
-        />
+    <DashPage>
+      <PageHeader
+        title="Settings"
+        description="Configure your financial profile, quick-add shortcuts, and data backup."
+      />
 
-        {/* Financial Setup Card */}
-        <Card className="border-border/60 shadow-none">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Financial Profile & Currency</CardTitle>
-            <CardDescription>
-              Configure your monthly salary, payday date, and preferred currency unit.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSaveFinancialProfile} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Monthly Salary</label>
-                  <Input
-                    type="number"
-                    value={salary}
-                    onChange={(e) => setSalary(e.target.value)}
-                    placeholder="e.g. 50000"
-                    required
-                  />
-                  <p className="text-[11px] text-muted-foreground">
-                    Used to calculate safe daily spending limits and pacing.
-                  </p>
-                </div>
+      <div className={cn(dashMuted, "grid grid-cols-2 gap-3 p-4 sm:grid-cols-4")}>
+        {stats.map((stat) => (
+          <div key={stat.label} className="rounded-xl bg-(--dash-surface) px-4 py-3 shadow-sm ring-1 ring-(--dash-border)">
+            <div className="flex items-center gap-2 text-(--dash-accent)">
+              <Icon name={stat.icon} className="size-3.5" aria-hidden />
+              <span className="text-xs font-bold uppercase tracking-wide">{stat.label}</span>
+            </div>
+            <p className="mt-2 font-mono text-xl font-bold tabular-nums text-(--dash-text)">{stat.value}</p>
+          </div>
+        ))}
+      </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Payday Date (1-28)</label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={28}
-                    value={salaryDate}
-                    onChange={(e) => setSalaryDate(e.target.value)}
-                    required
-                  />
-                  <p className="text-[11px] text-muted-foreground">
-                    Day of month salary lands to reset payday cycles.
-                  </p>
-                </div>
-              </div>
+      <SettingsSection
+        icon="zap"
+        title="Quick add presets"
+        description="Customize the one-tap expense buttons on your dashboard."
+      >
+        <QuickAddPresetsManager />
+      </SettingsSection>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Currency Preset</label>
-                  <select
-                    value={currencySymbol}
-                    onChange={(e) => {
-                      const sel = CURRENCIES.find((c) => c.symbol === e.target.value)
-                      if (sel) {
-                        setCurrencySymbol(sel.symbol)
-                        setCurrency(sel.name.split(" — ")[0])
-                      }
-                    }}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c.symbol} value={c.symbol}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Custom Currency Symbol</label>
-                  <Input
-                    value={currencySymbol}
-                    onChange={(e) => setCurrencySymbol(e.target.value)}
-                    placeholder="e.g. ৳ or $"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <Button type="submit" className="gap-1.5">
-                  <Icon name="check" className="size-4" />
-                  Save Profile Settings
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-
-        {/* Data Backup & Management Card */}
-        <Card className="border-border/60 shadow-none">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Data Backup & Management</CardTitle>
-            <CardDescription>
-              Export your data for safekeeping, import from a JSON file, or load demo dataset.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              <Button variant="outline" onClick={handleExportData} className="gap-1.5">
-                <Icon name="download" className="size-4" />
-                Export Data (JSON)
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="gap-1.5"
-              >
-                <Icon name="upload" className="size-4" />
-                Import Backup (JSON)
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleImportFile}
-                className="hidden"
+      <SettingsSection
+        icon="wallet"
+        title="Financial profile & currency"
+        description="Monthly salary, payday date, and preferred currency."
+      >
+        <form onSubmit={handleSaveFinancialProfile} className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className={dashLabel}>Monthly salary</label>
+              <Input
+                className={dashInput}
+                type="number"
+                value={salary}
+                onChange={(e) => setSalary(e.target.value)}
+                placeholder="e.g. 50000"
+                required
               />
-
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  loadDemo()
-                  toast.success("Loaded demo dataset!")
-                }}
-                className="gap-1.5"
-              >
-                <Icon name="sparkles" className="size-4" />
-                Load Demo Sample Data
-              </Button>
+              <p className={dashCaption}>Used for safe daily spending limits and cycle pacing.</p>
             </div>
 
-            <div className="border-t border-border/60 pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold text-destructive">Danger Zone</p>
-                <p className="text-xs text-muted-foreground">
-                  Permanently clear all transactions, custom categories, budgets, and loans.
+            <div className="space-y-1.5">
+              <label className={dashLabel}>Payday date (1–28)</label>
+              <Input
+                className={dashInput}
+                type="number"
+                min={1}
+                max={28}
+                value={salaryDate}
+                onChange={(e) => setSalaryDate(e.target.value)}
+                required
+              />
+              <p className={dashCaption}>Day of month your salary arrives to reset cycles.</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className={dashLabel}>Currency preset</label>
+              <select
+                value={currencySymbol}
+                onChange={(e) => {
+                  const sel = CURRENCIES.find((c) => c.symbol === e.target.value)
+                  if (sel) {
+                    setCurrencySymbol(sel.symbol)
+                    setCurrency(sel.name.split(" — ")[0])
+                  }
+                }}
+                className="dash-input w-full px-3 text-sm"
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c.symbol} value={c.symbol}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className={dashLabel}>Custom currency symbol</label>
+              <Input
+                className={dashInput}
+                value={currencySymbol}
+                onChange={(e) => setCurrencySymbol(e.target.value)}
+                placeholder="e.g. ৳ or $"
+                required
+              />
+            </div>
+          </div>
+
+          <Button variant="dash" type="submit" className="gap-1.5">
+            <Icon name="check" className="size-4" />
+            Save profile
+          </Button>
+        </form>
+      </SettingsSection>
+
+      <SettingsSection
+        icon="database"
+        title="Data backup & management"
+        description="Export, import, or reset your local financial data."
+      >
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" onClick={handleExportData} className="gap-1.5">
+              <Icon name="download" className="size-4" />
+              Export JSON
+            </Button>
+
+            <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-1.5">
+              <Icon name="upload" className="size-4" />
+              Import backup
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImportFile}
+              className="hidden"
+            />
+
+            <Button
+              variant="dash"
+              onClick={() => {
+                loadDemo()
+                toast.success("Loaded demo dataset!")
+              }}
+              className="gap-1.5"
+            >
+              <Icon name="sparkles" className="size-4" />
+              Load demo data
+            </Button>
+          </div>
+
+          <div className={cn(dashCard, "border border-destructive/20 bg-(--dash-danger-soft)/40 p-4 sm:p-5")}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <p className="flex items-center gap-2 text-sm font-semibold text-destructive">
+                  <Icon name="triangle-alert" className="size-4" />
+                  Danger zone
+                </p>
+                <p className={dashCaption}>
+                  Permanently clear all transactions, categories, budgets, and loan records.
                 </p>
               </div>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setResetConfirmOpen(true)}
-                className="gap-1.5"
-              >
+              <Button variant="destructive" size="sm" onClick={() => setResetConfirmOpen(true)} className="gap-1.5 shrink-0">
                 <Icon name="trash-2" className="size-4" />
-                Reset All Data
+                Reset all data
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Stored Stats Summary */}
-        <div className="rounded-xl bg-muted/40 p-4 text-xs text-muted-foreground space-y-1">
-          <p className="font-semibold text-foreground">Storage Statistics</p>
-          <p>
-            {data.transactions.length} Transactions · {data.categories.length} Categories ·{" "}
-            {Object.keys(data.budgets).length} Budgets · {data.loans.length} Loan/Debt Records
-          </p>
+          </div>
         </div>
+      </SettingsSection>
 
-        {/* Reset Confirmation Dialog */}
-        <Dialog open={resetConfirmOpen} onOpenChange={setResetConfirmOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-destructive">Reset All Data?</DialogTitle>
-              <DialogDescription>
-                This action will delete all your local transactions, budgets, categories, and loan records. This action cannot be undone unless you have an exported backup file.
-              </DialogDescription>
-            </DialogHeader>
+      <Dialog open={resetConfirmOpen} onOpenChange={setResetConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-destructive">Reset all data?</DialogTitle>
+            <DialogDescription>
+              This will delete all local transactions, budgets, categories, and loan records. This cannot be undone
+              unless you have an exported backup.
+            </DialogDescription>
+          </DialogHeader>
 
-            <DialogFooter className="pt-2">
-              <Button variant="outline" onClick={() => setResetConfirmOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  resetAll()
-                  setResetConfirmOpen(false)
-                  toast.success("All data has been reset.")
-                }}
-              >
-                Yes, Reset Everything
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+          <DialogFooter className="pt-2">
+            <Button variant="outline" onClick={() => setResetConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                resetAll()
+                setResetConfirmOpen(false)
+                toast.success("All data has been reset.")
+              }}
+            >
+              Yes, reset everything
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </DashPage>
   )
 }
