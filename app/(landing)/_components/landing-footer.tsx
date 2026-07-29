@@ -12,7 +12,7 @@ export function LandingFooter() {
 
   return (
     <>
-      <footer className="mt-32 w-full container border-t border-neutral-200/60 pt-12 pb-10 text-left space-y-8">
+      <footer className="section-padding w-full container border-t border-neutral-200/60 text-left space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="space-y-3">
             <Link href="/">

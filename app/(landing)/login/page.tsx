@@ -3,11 +3,18 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+import {
+  AuthDivider,
+  AuthField,
+  AuthPasswordField,
+  AuthShell,
+  AuthTerms,
+  AuthTitle,
+  GoogleAuthButton,
+} from "@/landing/auth/auth-shell"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -36,59 +43,51 @@ export default function LoginPage() {
     }
   }
 
+  const handleGoogle = () => {
+    toast.info("Google sign-in will be available soon.")
+  }
+
   return (
-    <div className="min-h-screen bg-[#FAF8F3] flex flex-col">
-      <header className="px-6 py-5">
-        <Link href="/">
-          <Image src="/logo.png" alt="Logo" width={180} height={48} className="h-11 w-auto object-contain" />
-        </Link>
-      </header>
+    <AuthShell
+      progress={50}
+      footer={
+        <>
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="font-bold text-neutral-900 underline underline-offset-2">
+            Sign up
+          </Link>
+        </>
+      }
+    >
+      <AuthTitle>Welcome back. Log in to your account.</AuthTitle>
 
-      <main className="flex-1 flex items-center justify-center px-6 pb-16">
-        <div className="w-full max-w-md rounded-3xl border border-neutral-200 bg-white p-8 shadow-xs space-y-6">
-          <div className="space-y-1 text-center">
-            <h1 className="font-serif text-3xl font-black text-neutral-900">Login</h1>
-            <p className="text-sm text-neutral-600">Access your personal finance dashboard.</p>
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthField
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+        <AuthPasswordField
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-800">Email</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                autoComplete="email"
-              />
-            </div>
+        <Button type="submit" className="w-full mt-2" size="lg" disabled={submitting}>
+          {submitting ? "Signing in..." : "Continue"}
+        </Button>
+      </form>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-800">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-              />
-            </div>
-
-            <Button type="submit" className="w-full" size="lg" disabled={submitting}>
-              {submitting ? "Signing in..." : "Login"}
-            </Button>
-          </form>
-
-          <p className="text-center text-sm text-neutral-600">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="font-semibold text-neutral-900 underline underline-offset-2">
-              Sign up
-            </Link>
-          </p>
-        </div>
-      </main>
-    </div>
+      <div className="mt-6 space-y-4">
+        <AuthDivider />
+        <GoogleAuthButton onClick={handleGoogle} />
+        <AuthTerms />
+      </div>
+    </AuthShell>
   )
 }

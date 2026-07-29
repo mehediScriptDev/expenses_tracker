@@ -48,7 +48,7 @@ function StageCard({ stage }: { stage: FinancialStage }) {
 
 export function FinancialStagesSection() {
   return (
-    <section id="who-its-for" className="mt-28 w-full container space-y-12 text-center">
+    <section id="who-its-for" className="section-padding w-full container space-y-12 text-center">
       <SectionHeading
         eyebrow="Designed for your real life"
         title="Who is Gorib Manush for?"

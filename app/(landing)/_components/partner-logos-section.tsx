@@ -4,7 +4,7 @@ const MARQUEE_LOGOS = Array.from({ length: 3 }, () => PARTNER_LOGOS).flat()
 
 export function PartnerLogosSection() {
   return (
-    <section className="mt-20 border-t border-neutral-200/60 pt-10 w-full max-w-4xl space-y-6 overflow-hidden text-center">
+    <section className="section-padding border-t border-neutral-200/60 w-full max-w-4xl space-y-6 overflow-hidden text-center">
       <p className="text-xs font-extrabold uppercase tracking-widest text-neutral-400">
         Trusted by the top companies in the world
       </p>

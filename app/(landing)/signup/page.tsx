@@ -3,11 +3,18 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+import {
+  AuthDivider,
+  AuthField,
+  AuthPasswordField,
+  AuthShell,
+  AuthTerms,
+  AuthTitle,
+  GoogleAuthButton,
+} from "@/landing/auth/auth-shell"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -15,6 +22,7 @@ export default function SignupPage() {
   const [name, setName] = React.useState("")
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
   const [submitting, setSubmitting] = React.useState(false)
 
   React.useEffect(() => {
@@ -25,6 +33,12 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.")
+      return
+    }
+
     setSubmitting(true)
     try {
       await signup(name, email, password)
@@ -37,70 +51,65 @@ export default function SignupPage() {
     }
   }
 
+  const handleGoogle = () => {
+    toast.info("Google sign-in will be available soon.")
+  }
+
   return (
-    <div className="min-h-screen bg-[#FAF8F3] flex flex-col">
-      <header className="px-6 py-5">
-        <Link href="/">
-          <Image src="/logo.png" alt="Logo" width={180} height={48} className="h-11 w-auto object-contain" />
-        </Link>
-      </header>
+    <AuthShell
+      progress={100}
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link href="/login" className="font-bold text-neutral-900 underline underline-offset-2">
+            Log in
+          </Link>
+        </>
+      }
+    >
+      <AuthTitle>Enter your details to create your account.</AuthTitle>
 
-      <main className="flex-1 flex items-center justify-center px-6 pb-16">
-        <div className="w-full max-w-md rounded-3xl border border-neutral-200 bg-white p-8 shadow-xs space-y-6">
-          <div className="space-y-1 text-center">
-            <h1 className="font-serif text-3xl font-black text-neutral-900">Sign up</h1>
-            <p className="text-sm text-neutral-600">Create your account and start tracking today.</p>
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthField
+          label="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          autoComplete="name"
+        />
+        <AuthField
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+        <AuthPasswordField
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+        />
+        <AuthPasswordField
+          label="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-800">Full name</label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                required
-                autoComplete="name"
-              />
-            </div>
+        <Button type="submit" className="w-full mt-2" size="lg" disabled={submitting}>
+          {submitting ? "Creating account..." : "Continue"}
+        </Button>
+      </form>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-800">Email</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                autoComplete="email"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-neutral-800">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="new-password"
-              />
-            </div>
-
-            <Button type="submit" className="w-full" size="lg" disabled={submitting}>
-              {submitting ? "Creating account..." : "Get started"}
-            </Button>
-          </form>
-
-          <p className="text-center text-sm text-neutral-600">
-            Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-neutral-900 underline underline-offset-2">
-              Login
-            </Link>
-          </p>
-        </div>
-      </main>
-    </div>
+      <div className="mt-6 space-y-4">
+        <AuthDivider />
+        <GoogleAuthButton onClick={handleGoogle} />
+        <AuthTerms />
+      </div>
+    </AuthShell>
   )
 }

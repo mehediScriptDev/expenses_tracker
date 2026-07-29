@@ -3,7 +3,7 @@ import { LandingCta } from "./landing-cta"
 
 export function MethodSection() {
   return (
-    <section className="mt-28 w-full container">
+    <section className="section-padding w-full container">
       <div className="rounded-3xl bg-[#FAF0E6] p-8 sm:p-12 md:p-16 text-neutral-900 shadow-2xs">
         <div className="grid gap-12 lg:grid-cols-12 items-center">
           <div className="lg:col-span-5 space-y-6 text-left">

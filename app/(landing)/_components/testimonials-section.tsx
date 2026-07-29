@@ -56,7 +56,7 @@ function TestimonialMarquee({
 
 export function TestimonialsSection() {
   return (
-    <section className="mt-28 w-full space-y-12 overflow-hidden py-4">
+    <section className="section-padding w-full space-y-12 overflow-hidden">
       <div className="px-6">
         <SectionHeading
           eyebrow="Testimonial"

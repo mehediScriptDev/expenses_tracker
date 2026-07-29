@@ -18,7 +18,7 @@ export function HeroSection() {
         Whether you&apos;re budgeting, tracking expenses, or saving for the future, we make it simple and stress-free.
       </p>
 
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+      <div className="mt-8 flex flex-col-reverse sm:flex-row items-center justify-center gap-2 sm:gap-3 lg:gap-4">
         <Button variant="outline" size="lg" asChild>
           <a href="#who-its-for">Learn More</a>
         </Button>

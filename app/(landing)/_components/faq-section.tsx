@@ -8,7 +8,7 @@ export function FaqSection() {
   const [openId, setOpenId] = React.useState<number | null>(0)
 
   return (
-    <section id="faq" className="mt-28 w-full max-w-4xl mx-auto px-6 space-y-10 text-left">
+    <section id="faq" className="section-padding w-full max-w-4xl mx-auto px-6 space-y-10 text-left">
       <SectionHeading
         eyebrow="FAQ"
         title="Common Questions"

@@ -26,7 +26,7 @@ function ChangeStepCard({ step }: { step: ChangeStep }) {
 
 export function WhatChangesSection() {
   return (
-    <section className="mt-28 w-full container">
+    <section className="section-padding w-full container">
       <SectionHeading
         eyebrow="What changes"
         title="How this shows up in your wallet"

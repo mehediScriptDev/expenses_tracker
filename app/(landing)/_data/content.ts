@@ -38,9 +38,9 @@ export const FAQ_ITEMS: FaqItem[] = [
 ]
 
 export const PARTNER_LOGOS = [
-  "Evernote",
-  "amazon",
-  "Airtable",
-  "gumroad",
-  "Notion",
+  "Mak tech",
+  "Wishper Wall",
+  "Shikkhaloy",
+  "Artisan",
+  "Logicnest",
 ] as const
