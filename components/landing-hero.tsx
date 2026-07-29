@@ -15,81 +15,96 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
 
   const testimonialsRow1 = [
     {
-      name: "David James Lee",
-      role: "Fitness Trainer",
-      avatar: "👨‍💼",
-      quote: "FinBuddy provides a flawless budgeting experience every time. I highly recommend it to everyone looking for clarity!",
+      name: "Asif Faiyaaz Saran",
+      role: "Network & Systems Engineer",
+      avatar: "/review/asif_faiyaaz_saran.webp",
+      quote: "good app",
     },
     {
-      name: "Emily Anne Roberts",
-      role: "Marketing Manager",
-      avatar: "👩‍💼",
-      quote: "FinBuddy helped me track daily expenses quickly and set realistic limits easily. I love how user-friendly the app is!",
+      name: "Bablu Mia",
+      role: "Full Stack Developer",
+      avatar: "/review/bablu_mia.webp",
+      quote: "vloi features ase. recommend",
     },
     {
-      name: "John Michael Mitchell",
-      role: "Software Engineer",
-      avatar: "👨‍💻",
-      quote: "The app's financial health score and payday pacing system is insanely smart and secure. The best finance platform I've used!",
+      name: "Kamrul",
+      role: "Sr.Frontend Engineer",
+      avatar: "/review/kamrul.webp",
+      quote: "good work",
     },
     {
-      name: "Sarah Jenkins",
-      role: "Product Designer",
-      avatar: "👩‍🎨",
-      quote: "Tracking daily expenses has never been this effortless, clear, and visually satisfying.",
+      name: "Mehedi",
+      role: "Student",
+      avatar: "/review/mehedi.webp",
+      quote: "helped me a lot, recommend",
+    },
+    {
+      name: "Naim Islam",
+      role: "Teacher",
+      avatar: "/review/naim_islam.webp",
+      quote: "recommend",
+    },
+    {
+      name: "Rakibul Hasan",
+      role: "Backend Developer",
+      avatar: "/review/rakibul_hasan.webp",
+      quote: "sei jinis vai, use korte paren",
     },
   ]
 
   const testimonialsRow2 = [
     {
-      name: "Anthony Johnson",
-      role: "Freelancer",
-      avatar: "👨‍🎨",
-      quote: "FinBuddy keeps me organized and completely focused on my monthly savings targets without any stress!",
+      name: "Saifuzzaman",
+      role: "AI Engineer",
+      avatar: "/review/saifuzzaman.webp",
+      quote: "thanks to him who built this",
     },
     {
-      name: "Alexander John Parker",
-      role: "Photographer",
-      avatar: "📷",
-      quote: "With FinBuddy, I can easily track my borrowed money and savings goals, saving both time and mental energy!",
+      name: "Sajeeb Roy",
+      role: "Student",
+      avatar: "/review/sajeeb_roy.webp",
+      quote: "helpful app, thanks team",
     },
     {
-      name: "Michael Edward Brooks",
-      role: "Entrepreneur",
-      avatar: "👔",
-      quote: "I love how FinBuddy provides personalized insights, always showing me spending habits I should adjust.",
+      name: "Shahariar Sanny",
+      role: "Software Engineer",
+      avatar: "/review/shahariar_sanny.webp",
+      quote: "definitely recommended",
     },
     {
-      name: "Maria Garcia",
-      role: "Financial Advisor",
-      avatar: "👩‍💼",
-      quote: "A genuine game-changer for personal budgeting, payday pacing, and financial peace of mind.",
+      name: "Talha Alif",
+      role: "Backend Developer",
+      avatar: "/review/talha_alif.webp",
+      quote: "good ui, i loved it",
+    },
+    {
+      name: "Wasif Ahmed",
+      role: "Student",
+      avatar: "/review/wasif_ahmed.webp",
+      quote: "really nice app and easy to use",
     },
   ]
 
-  const faqsCol1 = [
+  const faqs = [
     {
       id: 0,
-      q: "How do I track daily expenses on FinBuddy?",
-      a: "Simply tap 'Add Expense' or use the quick preset chips (Food, Transport, Groceries) to log any purchase in seconds. FinBuddy automatically calculates your daily spending pace.",
+      q: "How do I track daily expenses on Gorib Manush?",
+      a: "Simply tap 'Add Expense' or use the quick preset chips (Food, Transport, Groceries) to log any purchase in seconds. Gorib Manush automatically calculates your daily spending pace.",
     },
     {
       id: 1,
       q: "What payment methods and currencies are supported?",
-      a: "FinBuddy supports BDT (৳), USD ($), EUR (€), GBP (£), INR (₹), and all major world currencies with customizable currency symbols.",
+      a: "Gorib Manush supports BDT (৳), USD ($), EUR (€), GBP (£), INR (₹), and all major world currencies with customizable currency symbols.",
     },
     {
       id: 2,
       q: "How does the safe daily spending limit work?",
-      a: "FinBuddy divides your remaining salary for the cycle by the number of days left until payday, giving you a clear, safe daily limit.",
+      a: "Gorib Manush divides your remaining salary for the cycle by the number of days left until payday, giving you a clear, safe daily limit.",
     },
-  ]
-
-  const faqsCol2 = [
     {
       id: 3,
       q: "Will I receive reminders for upcoming loan payments?",
-      a: "Yes! FinBuddy flags overdue and upcoming loan due dates right on your dashboard so you never miss a repayment.",
+      a: "Yes! Gorib Manush flags overdue and upcoming loan due dates right on your dashboard so you never miss a repayment.",
     },
     {
       id: 4,
@@ -129,7 +144,7 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
 
         <div className="flex items-center gap-3">
           <Button variant="outline" size="lg" asChild>
-            <Link href="/settings">Contact Us</Link>
+            <Link href="/settings">About us</Link>
           </Button>
           <Button size="lg" asChild>
             <Link href="/dashboard">Dashboard →</Link>
@@ -154,7 +169,7 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
 
         {/* Hero Subtitle */}
         <p className="mt-6 text-base sm:text-lg text-neutral-600 max-w-2xl text-pretty leading-relaxed">
-          Say goodbye to financial stress with FinBuddy, your all-in-one money management solution. Whether you&apos;re budgeting, tracking expenses, or saving for the future, we make it simple and stress-free.
+          Say goodbye to financial stress with Gorib Manush, your all-in-one money management solution. Whether you&apos;re budgeting, tracking expenses, or saving for the future, we make it simple and stress-free.
         </p>
 
         {/* Hero Action Buttons */}
@@ -164,7 +179,7 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
           </Button>
           <Button size="lg" className="whitespace-nowrap" asChild>
             <Link href="/dashboard" className="inline-flex items-center gap-2 whitespace-nowrap">
-              <span>Get Started</span>
+              <span>Start Tracking</span>
               <Icon name="arrow-right" className="size-4 shrink-0" />
             </Link>
           </Button>
@@ -316,7 +331,7 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
               The all-in-one money platform
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 max-w-2xl mx-auto text-pretty">
-              Experience the convenience of managing your money on the go with FinBuddy. Whether it&apos;s tracking expenses, setting budgets, or planning goals, we&apos;ve got you covered.
+              Experience the convenience of managing your money on the go with Gorib Manush. Whether it&apos;s tracking expenses, setting budgets, or planning goals, we&apos;ve got you covered.
             </p>
           </div>
 
@@ -557,29 +572,50 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
               Real Stories from Our App Users
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 text-pretty">
-              Read how FinBuddy has transformed the event and money management experiences of our users through convenience and ease of use.
+              Read how Gorib Manush has transformed the event and money management experiences of our users through convenience and ease of use.
             </p>
           </div>
 
           {/* Continuous Smooth Scrolling Marquee Rows */}
-          <div className="space-y-6 w-full">
+          <div className="space-y-3 w-full">
             
             {/* Row 1: Left to Right Marquee */}
             <div className="relative overflow-hidden w-full py-2">
-              <div className="animate-marquee-right flex gap-6">
+              <div className="animate-marquee-right flex gap-4">
                 {[...testimonialsRow1, ...testimonialsRow1, ...testimonialsRow1].map((t, idx) => (
                   <div
                     key={idx}
-                    className="w-[320px] shrink-0 rounded-2xl bg-white p-6 shadow-xs text-left space-y-4 hover:shadow-md transition-all"
+                    className="w-[320px] shrink-0 rounded-xl border border-neutral-200/80 bg-white p-5  transition-all text-left space-y-3.5 flex flex-col justify-between"
                   >
-                    <p className="text-xs text-neutral-600 leading-relaxed italic">&quot;{t.quote}&quot;</p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-neutral-100">
-                      <span className="flex size-9 items-center justify-center rounded-full bg-amber-100 text-lg">
-                        {t.avatar}
-                      </span>
-                      <div>
-                        <p className="text-xs font-bold text-neutral-900">{t.name}</p>
-                        <p className="text-[10px] text-neutral-400">{t.role}</p>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-0.5 text-amber-400">
+                        {[...Array(5)].map((_, i) => (
+                          <Icon key={i} name="star" className="size-3.5 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+
+                      <p className="text-sm text-neutral-800 leading-relaxed font-medium">
+                        &ldquo;{t.quote}&rdquo;
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-3 border-t border-neutral-100">
+                      {t.avatar.startsWith("/") ? (
+                        <Image
+                          src={t.avatar}
+                          alt={t.name}
+                          width={44}
+                          height={44}
+                          className="size-11 rounded-full object-cover shrink-0 ring-2 ring-neutral-200/70 shadow-2xs"
+                        />
+                      ) : (
+                        <span className="flex size-11 items-center justify-center rounded-full bg-amber-100 text-xl ring-2 ring-neutral-200/70">
+                          {t.avatar}
+                        </span>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm font-bold text-neutral-900 truncate tracking-tight">{t.name}</h4>
+                        <p className="text-xs text-neutral-500 truncate font-normal">{t.role}</p>
                       </div>
                     </div>
                   </div>
@@ -589,20 +625,41 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
 
             {/* Row 2: Right to Left Marquee */}
             <div className="relative overflow-hidden w-full py-2">
-              <div className="animate-marquee-left flex gap-6">
+              <div className="animate-marquee-left flex gap-4">
                 {[...testimonialsRow2, ...testimonialsRow2, ...testimonialsRow2].map((t, idx) => (
                   <div
                     key={idx}
-                    className="w-[320px] shrink-0 rounded-2xl bg-white p-6 shadow-xs text-left space-y-4 hover:shadow-md transition-all"
+                    className="w-[320px] shrink-0 rounded-2xl border border-neutral-200/80 bg-white p-5  transition-all text-left space-y-3.5 flex flex-col justify-between"
                   >
-                    <p className="text-xs text-neutral-600 leading-relaxed italic">&quot;{t.quote}&quot;</p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-neutral-100">
-                      <span className="flex size-9 items-center justify-center rounded-full bg-green-100 text-lg">
-                        {t.avatar}
-                      </span>
-                      <div>
-                        <p className="text-xs font-bold text-neutral-900">{t.name}</p>
-                        <p className="text-[10px] text-neutral-400">{t.role}</p>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-0.5 text-amber-400">
+                        {[...Array(5)].map((_, i) => (
+                          <Icon key={i} name="star" className="size-3.5 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+
+                      <p className="text-sm text-neutral-800 leading-relaxed font-medium">
+                        &ldquo;{t.quote}&rdquo;
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-3 border-t border-neutral-100">
+                      {t.avatar.startsWith("/") ? (
+                        <Image
+                          src={t.avatar}
+                          alt={t.name}
+                          width={44}
+                          height={44}
+                          className="size-11 rounded-full object-cover shrink-0 ring-2 ring-neutral-200/70 shadow-2xs"
+                        />
+                      ) : (
+                        <span className="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-xl ring-2 ring-neutral-200/70">
+                          {t.avatar}
+                        </span>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm font-bold text-neutral-900 truncate tracking-tight">{t.name}</h4>
+                        <p className="text-xs text-neutral-500 truncate font-normal">{t.role}</p>
                       </div>
                     </div>
                   </div>
@@ -614,134 +671,88 @@ export function LandingHero({ onOpenDashboard }: LandingHeroProps) {
         </section>
 
         {/* Section 4: Frequently Asked Question Accordion */}
-        <section className="mt-28 w-full container space-y-12 text-left">
+        <section className="mt-28 w-full max-w-4xl mx-auto px-6 space-y-10 text-left" id="faq">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1 text-xs font-bold text-neutral-700 shadow-2xs">
               <Icon name="book-open" className="size-3.5 text-[#00A86B]" />
               <span>FAQ</span>
             </div>
             <h2 className="font-serif text-3xl sm:text-5xl font-black text-neutral-900 tracking-tight">
-              Frequently Asked Question
+              Common Questions
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 text-pretty">
-              These are some frequently asked questions we&apos;ve answered to help new users getting started.
+              These are some frequently asked questions we&apos;ve answered to help new users get started.
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 items-start">
-            {/* Column 1 */}
-            <div className="space-y-4">
-              {faqsCol1.map((faq) => {
-                const isOpen = openFaq === faq.id
-                return (
-                  <div
-                    key={faq.id}
-                    className="rounded-2xl bg-white p-5 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-                    onClick={() => setOpenFaq(isOpen ? null : faq.id)}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-serif text-sm font-bold text-neutral-900">{faq.q}</h3>
-                      <span className="font-mono text-sm font-bold text-neutral-400">{isOpen ? "∧" : "∨"}</span>
-                    </div>
-                    {isOpen && (
-                      <p className="mt-3 text-xs text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3 animate-in fade-in duration-200">
-                        {faq.a}
-                      </p>
-                    )}
+          <div className="border-t border-neutral-200 dark:border-neutral-800">
+            {faqs.map((faq) => {
+              const isOpen = openFaq === faq.id
+              return (
+                <div
+                  key={faq.id}
+                  className="border-b border-neutral-200 dark:border-neutral-800 py-6 cursor-pointer transition-colors group"
+                  onClick={() => setOpenFaq(isOpen ? null : faq.id)}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-foreground tracking-tight group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
+                      {faq.q}
+                    </h3>
+                    <span className="text-2xl font-light text-neutral-900 dark:text-foreground shrink-0 select-none">
+                      {isOpen ? "−" : "+"}
+                    </span>
                   </div>
-                )
-              })}
-            </div>
-
-            {/* Column 2 */}
-            <div className="space-y-4">
-              {faqsCol2.map((faq) => {
-                const isOpen = openFaq === faq.id
-                return (
-                  <div
-                    key={faq.id}
-                    className="rounded-2xl bg-white p-5 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-                    onClick={() => setOpenFaq(isOpen ? null : faq.id)}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-serif text-sm font-bold text-neutral-900">{faq.q}</h3>
-                      <span className="font-mono text-sm font-bold text-neutral-400">{isOpen ? "∧" : "∨"}</span>
-                    </div>
-                    {isOpen && (
-                      <p className="mt-3 text-xs text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3 animate-in fade-in duration-200">
-                        {faq.a}
-                      </p>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                  {isOpen && (
+                    <p className="mt-4 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 font-normal leading-relaxed max-w-3xl animate-in fade-in duration-200">
+                      {faq.a}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </section>
 
         {/* Section 5: Footer */}
-        <footer className="mt-32 w-full container border-t border-neutral-200/50 pt-16 pb-12 space-y-12 text-left">
-          <div className="grid gap-8 sm:grid-cols-5">
-            {/* Logo & Socials */}
-            <div className="sm:col-span-2 space-y-5">
+        <footer className="mt-32 w-full container border-t border-neutral-200/60 pt-12 pb-10 text-left space-y-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            {/* Logo & Description */}
+            <div className="space-y-3">
               <Link href="/" className="inline-block">
                 <Image
                   src="/logo.png"
-                  alt="Logo"
-                  width={200}
-                  height={50}
-                  className="h-12 w-auto object-contain"
+                  alt="Gorib Manush Logo"
+                  width={180}
+                  height={45}
+                  className="h-10 w-auto object-contain"
                 />
               </Link>
-              <p className="text-xs text-neutral-500 max-w-xs leading-relaxed">
-                FinBuddy helps you take complete control of your finances with daily spending limits, budget tracking, and savings goals.
+              <p className="text-xs text-neutral-500 max-w-sm leading-relaxed">
+                Gorib Manush helps you take complete control of your finances with daily spending limits, budget tracking, and savings goals.
               </p>
-              <div className="flex items-center gap-3 pt-1">
-                {["facebook", "instagram", "twitter", "linkedin"].map((soc) => (
-                  <span
-                    key={soc}
-                    className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 hover:text-neutral-900 shadow-2xs transition-all cursor-pointer"
-                  >
-                    <Icon name={soc} className="size-4" />
-                  </span>
-                ))}
-              </div>
             </div>
 
-            {/* Support */}
-            <div className="space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-neutral-900">Support</p>
-              <ul className="space-y-2 text-xs text-neutral-500 font-medium">
-                <li><a href="#faq" className="hover:text-neutral-900">Help Center</a></li>
-                <li><Link href="/settings" className="hover:text-neutral-900">Contact Us</Link></li>
-                <li><a href="#faq" className="hover:text-neutral-900">FAQ</a></li>
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div className="space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-neutral-900">Resources</p>
-              <ul className="space-y-2 text-xs text-neutral-500 font-medium">
-                <li><a href="#features" className="hover:text-neutral-900">Tips & Articles</a></li>
-                <li><Link href="/insights" className="hover:text-neutral-900">Knowledge</Link></li>
-                <li><a href="#blog" className="hover:text-neutral-900">Blog</a></li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div className="space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-neutral-900">Legal</p>
-              <ul className="space-y-2 text-xs text-neutral-500 font-medium">
-                <li><a href="#" className="hover:text-neutral-900">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-neutral-900">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-neutral-900">Cookie Policy</a></li>
-              </ul>
+            {/* Simple Page Links */}
+            <div className="flex flex-wrap items-center gap-6 text-xs text-neutral-600 font-medium">
+              <a href="#faq" className="hover:text-neutral-900 transition-colors">Privacy Policy</a>
+              <a href="#faq" className="hover:text-neutral-900 transition-colors">Legal Terms</a>
+              <Link href="/dashboard" className="hover:text-neutral-900 transition-colors">Dashboard</Link>
             </div>
           </div>
 
-          <div className="border-t border-neutral-200/50 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-400">
-            <p>© 2026 FinBuddy. All rights reserved.</p>
-            <p>Built with intentionality & precision.</p>
+          <div className="border-t border-neutral-200/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-neutral-500">
+            <p>© 2026 Gorib Manush. All rights reserved.</p>
+            <p>
+              Developed by{" "}
+              <a
+                href="https://mehediscriptdev.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-neutral-800 hover:text-black underline underline-offset-2 transition-colors"
+              >
+                Mehedi
+              </a>
+            </p>
           </div>
         </footer>
 

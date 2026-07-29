@@ -224,7 +224,7 @@ export function CommandPalette({
 
         <div className="border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground flex items-center justify-between">
           <span>Tip: Press <kbd className="rounded bg-muted px-1 font-mono">⌘K</kbd> anywhere to open</span>
-          <span className="font-medium">FinBuddy Quick Search</span>
+          <span className="font-medium">Gorib Manush Quick Search</span>
         </div>
       </DialogContent>
     </Dialog>
