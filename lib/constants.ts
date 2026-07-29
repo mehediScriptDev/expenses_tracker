@@ -57,3 +57,4 @@ export const CATEGORY_COLOR_CHOICES = [
 ]
 
 export const STORAGE_KEY = "finbuddy:data:v1"
+export const AUTH_KEY = "finbuddy:auth:v1"

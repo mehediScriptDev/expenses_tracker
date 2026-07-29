@@ -1,6 +1,9 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { LandingCta } from "./landing-cta"
 
 export function LandingHeader() {
   return (
@@ -18,11 +21,9 @@ export function LandingHeader() {
 
       <div className="flex items-center gap-3">
         <Button variant="outline" size="lg" asChild>
-          <Link href="#">Who's for</Link>
+          <Link href="#who-its-for">Who&apos;s for</Link>
         </Button>
-        <Button size="lg" asChild>
-          <Link href="/dashboard">Dashboard →</Link>
-        </Button>
+        <LandingCta intent="signup" size="lg" />
       </div>
     </header>
   )

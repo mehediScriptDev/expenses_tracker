@@ -3,6 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth"
 import { usePathname } from "next/navigation"
 import { Icon } from "@/lib/icon"
 import { cn } from "@/lib/utils"
@@ -42,6 +44,8 @@ function Brand() {
 }
 
 function UserMenu() {
+  const router = useRouter()
+  const { logout } = useAuth()
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -78,18 +82,17 @@ function UserMenu() {
             </Link>
 
             <div className="border-t border-neutral-200 pt-3">
-              <Link
-                href="/"
+              <button
+                type="button"
                 onClick={() => {
                   setOpen(false)
-                  if (typeof window !== "undefined") {
-                    window.location.href = "/"
-                  }
+                  logout()
+                  router.push("/")
                 }}
-                className="block font-medium text-neutral-700 hover:text-black transition-colors"
+                className="block w-full text-left font-medium text-neutral-700 hover:text-black transition-colors cursor-pointer"
               >
                 Logout
-              </Link>
+              </button>
             </div>
           </div>
         </div>

@@ -4,21 +4,23 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
+const buttonHover =
+  'hover:bg-[#171717] hover:text-white hover:border-[#171717] [&_svg]:transition-colors [&_svg]:duration-200 hover:[&_svg]:text-white'
+
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center font-extrabold uppercase tracking-wider whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 rounded-tl-[4px] rounded-tr-[12px] rounded-br-none rounded-bl-[14px] cursor-pointer",
+  'group/button inline-flex shrink-0 items-center justify-center font-extrabold uppercase tracking-wider whitespace-nowrap transition-colors duration-200 ease-in-out outline-none select-none disabled:pointer-events-none disabled:opacity-50 rounded-tl-[4px] rounded-tr-[12px] rounded-br-none rounded-bl-[14px] cursor-pointer',
   {
     variants: {
       variant: {
-        default: 'bg-[#FFC700] text-black hover:brightness-105 active:scale-97',
-        outline:
-          'border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-muted dark:text-foreground',
-        secondary:
-          'bg-neutral-900 text-[#FFC700] hover:bg-neutral-800 active:scale-97',
-        ghost:
-          'hover:bg-neutral-100 hover:text-foreground dark:hover:bg-muted/50 text-neutral-700 font-medium normal-case tracking-normal',
-        destructive:
-          'bg-red-500 text-white hover:bg-red-600 active:scale-97',
-        link: 'text-neutral-900 underline-offset-4 hover:underline normal-case tracking-normal font-medium',
+        default: cn('bg-[#FFC700] text-black border border-transparent', buttonHover),
+        outline: cn('border border-neutral-300 bg-white text-neutral-800', buttonHover),
+        secondary: cn('bg-neutral-900 text-[#FFC700] border border-transparent', buttonHover),
+        ghost: cn(
+          'border border-transparent text-neutral-700 font-medium normal-case tracking-normal',
+          buttonHover,
+        ),
+        destructive: cn('bg-red-500 text-white border border-transparent', buttonHover),
+        link: 'border-transparent text-neutral-900 underline-offset-4 hover:text-[#171717] hover:underline normal-case tracking-normal font-medium bg-transparent',
       },
       size: {
         default: 'h-9 px-5 text-xs gap-1.5',

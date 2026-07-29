@@ -25,7 +25,7 @@ export function RecentTransactions() {
         <Link
           href="/transactions"
           style={{ borderRadius: "0 999px 0 999px" }}
-          className="bg-neutral-900 text-[#D4E4FF] px-4 py-1 text-[11px] font-extrabold hover:bg-neutral-800 transition-colors"
+          className="bg-neutral-900 text-[#D4E4FF] px-4 py-1 text-[11px] font-extrabold transition-colors duration-200 ease-in-out hover:bg-[#171717] hover:text-white"
         >
           View all
         </Link>
@@ -41,7 +41,7 @@ export function RecentTransactions() {
               <button
                 onClick={ui.openAdd}
                 style={{ borderRadius: "0 999px 0 999px" }}
-                className="bg-[#FFD000] text-neutral-900 px-5 py-2 text-xs font-extrabold hover:brightness-105 transition-all"
+                className="bg-[#FFD000] text-neutral-900 px-5 py-2 text-xs font-extrabold transition-colors duration-200 ease-in-out hover:bg-[#171717] hover:text-white"
               >
                 <Icon name="plus" className="size-3.5 inline mr-1" />
                 Add transaction

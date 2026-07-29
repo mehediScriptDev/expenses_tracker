@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Plus_Jakarta_Sans, Fraunces, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { StoreProvider } from "@/lib/store"
+import { AuthProvider } from "@/lib/auth"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
@@ -31,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="light bg-background">
       <body className={`${jakarta.variable} ${fraunces.variable} ${geistMono.variable} font-sans antialiased`}>
-        <StoreProvider>{children}</StoreProvider>
+        <AuthProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </AuthProvider>
         <Toaster position="top-center" />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>

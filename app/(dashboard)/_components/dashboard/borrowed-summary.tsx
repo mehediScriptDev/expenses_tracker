@@ -21,7 +21,7 @@ export function BorrowedSummary() {
         <Link
           href="/borrowed"
           style={{ borderRadius: "0 999px 0 999px" }}
-          className="bg-neutral-900 text-[#FFD000] px-4 py-1 text-[11px] font-extrabold hover:bg-neutral-800 transition-colors"
+          className="bg-neutral-900 text-[#FFD000] px-4 py-1 text-[11px] font-extrabold transition-colors duration-200 ease-in-out hover:bg-[#171717] hover:text-white"
         >
           Manage
         </Link>

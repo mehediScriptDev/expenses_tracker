@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { LandingPage } from "@/landing/landing-page"
-import { Button } from "@/components/ui/button"
+import { LandingCta } from "@/landing/landing-cta"
 
 export default function HomePage() {
   const [scrolled, setScrolled] = React.useState(false)
@@ -22,9 +21,7 @@ export default function HomePage() {
 
       {scrolled && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in zoom-in duration-300">
-          <Button size="lg" asChild>
-            <Link href="/dashboard">Dashboard →</Link>
-          </Button>
+          <LandingCta intent="get-started" size="lg" />
         </div>
       )}
     </div>
