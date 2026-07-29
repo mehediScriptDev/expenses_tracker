@@ -3,7 +3,6 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
-import { AppShell } from "./_components/layout/app-shell"
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()

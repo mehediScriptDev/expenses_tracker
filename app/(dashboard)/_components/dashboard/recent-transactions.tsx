@@ -42,7 +42,7 @@ export function RecentTransactions() {
           />
         </div>
       ) : (
-        <div className="space-y-2 px-3 pb-4 sm:px-4">
+        <div className="space-y-1.5 px-2 pb-3 sm:space-y-2 sm:px-4 sm:pb-4">
           {recent.map((tx) => (
             <TransactionRow key={tx.id} tx={tx} onEdit={ui.openEdit} />
           ))}

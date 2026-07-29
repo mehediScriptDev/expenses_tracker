@@ -8,8 +8,7 @@ import {
   CategoryBadge,
   dashInput,
   DashPage,
-  StatTile,
-  StatGrid,
+  SummaryBar,
   PageHero,
   StatusBadge,
   DashboardCard,
@@ -70,7 +69,7 @@ export default function BudgetsPage() {
     <DashPage>
       <PageHeader title="Budgets" description="Set monthly limits and track spending against each category.">
         {unbudgetedCategories.length > 0 ? (
-          <Button variant="dash" onClick={() => setIsAddOpen(true)} className="gap-1.5 rounded-full px-5">
+          <Button variant="dash" onClick={() => setIsAddOpen(true)} className="h-11 w-full gap-1.5 px-5 sm:w-auto">
             <Icon name="plus" className="size-4" />
             Set budget
           </Button>
@@ -82,7 +81,7 @@ export default function BudgetsPage() {
         value={formatMoney(totalBudgeted, { symbol: data.settings.currencySymbol })}
         caption={
           <>
-            <strong className="font-semibold text-[var(--dash-text)]">
+            <strong className="font-semibold text-(--dash-text)">
               {formatMoney(totalSpent, { symbol: data.settings.currencySymbol })}
             </strong>{" "}
             spent this month ·{" "}
@@ -102,7 +101,7 @@ export default function BudgetsPage() {
         <div className="max-w-xl space-y-2">
           <div className="flex items-center justify-between gap-3 text-sm">
             <span className="font-medium text-[var(--dash-text-secondary)]">Overall usage</span>
-            <span className="font-semibold tabular-nums text-[var(--dash-text)]">{Math.round(overallPct)}%</span>
+            <span className="font-semibold tabular-nums text-(--dash-text)">{Math.round(overallPct)}%</span>
           </div>
           <ProgressBar
             value={overallPct}
@@ -113,27 +112,26 @@ export default function BudgetsPage() {
       </PageHero>
 
       {budgetUsages.length > 0 ? (
-        <StatGrid>
-          <StatTile icon="target" label="Active budgets" value={budgetUsages.length} />
-          <StatTile
-            icon="circle-check"
-            label="On track"
-            value={budgetUsages.length - overCount - warningCount}
-            tone="success"
-          />
-          <StatTile
-            icon="triangle-alert"
-            label="Near limit"
-            value={warningCount}
-            tone={warningCount > 0 ? "warning" : "default"}
-          />
-          <StatTile
-            icon="circle-x"
-            label="Over budget"
-            value={overCount}
-            tone={overCount > 0 ? "danger" : "default"}
-          />
-        </StatGrid>
+        <SummaryBar
+          items={[
+            { label: "Active", value: budgetUsages.length },
+            {
+              label: "On track",
+              value: budgetUsages.length - overCount - warningCount,
+              tone: "success",
+            },
+            {
+              label: "Near limit",
+              value: warningCount,
+              tone: warningCount > 0 ? "warning" : "default",
+            },
+            {
+              label: "Over",
+              value: overCount,
+              tone: overCount > 0 ? "danger" : "default",
+            },
+          ]}
+        />
       ) : null}
 
       {budgetUsages.length === 0 ? (
@@ -168,7 +166,7 @@ export default function BudgetsPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-8 text-[var(--dash-text-muted)] hover:text-[var(--dash-text)]"
+                      className="size-8 text-[var(--dash-text-muted)] hover:text-(--dash-text)"
                       onClick={() => {
                         setEditingCatId(u.category.id)
                         setBudgetInput(String(u.budget))
@@ -186,13 +184,13 @@ export default function BudgetsPage() {
                 </div>
 
                 {isEditing ? (
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Input
                       type="number"
                       value={budgetInput}
                       onChange={(e) => setBudgetInput(e.target.value)}
                       placeholder="Amount"
-                      className={cn(dashInput, "h-10 text-sm")}
+                      className={cn(dashInput, "h-10 min-w-0 flex-1 text-sm")}
                       autoFocus
                     />
                     <Button variant="dash" size="sm" className="h-10 px-4" onClick={() => handleSaveBudget(u.category.id)}>
@@ -209,7 +207,7 @@ export default function BudgetsPage() {
                         <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
                           Spent
                         </p>
-                        <p className="mt-1 font-mono text-xl font-bold tabular-nums text-[var(--dash-text)]">
+                        <p className="mt-1 font-mono text-xl font-bold tabular-nums text-(--dash-text)">
                           {formatMoney(u.spent, { symbol: data.settings.currencySymbol })}
                         </p>
                       </div>

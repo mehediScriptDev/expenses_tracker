@@ -10,8 +10,7 @@ import {
   dashSegmentItemActive,
   dashInput,
   DashPage,
-  StatTile,
-  StatGrid,
+  SummaryBar,
   FilterToolbar,
   DateGroupHeader,
 } from "@/dashboard/shared"
@@ -26,7 +25,7 @@ import { cn } from "@/lib/utils"
 
 type TypeFilter = "all" | "expense" | "income"
 
-function TransactionsContent() {
+export default function TransactionsPage() {
   const { data } = useStore()
   const ui = useUI()
 
@@ -84,32 +83,25 @@ function TransactionsContent() {
         </Button>
       </PageHeader>
 
-      <StatGrid>
-        <StatTile
-          icon="receipt-text"
-          label="Showing"
-          value={totals.count}
-          subtext={search || typeFilter !== "all" ? "Filtered results" : "All records"}
-        />
-        <StatTile
-          icon="arrow-down-left"
-          label="Income"
-          value={formatMoney(totals.income, { symbol: data.settings.currencySymbol })}
-          tone="success"
-        />
-        <StatTile
-          icon="arrow-up-right"
-          label="Expenses"
-          value={formatMoney(totals.expense, { symbol: data.settings.currencySymbol })}
-          tone="default"
-        />
-        <StatTile
-          icon="scale"
-          label="Net"
-          value={formatMoney(totals.net, { symbol: data.settings.currencySymbol, sign: true })}
-          tone={totals.net >= 0 ? "success" : "danger"}
-        />
-      </StatGrid>
+      <SummaryBar
+        items={[
+          { label: "Showing", value: totals.count },
+          {
+            label: "Income",
+            value: formatMoney(totals.income, { symbol: data.settings.currencySymbol }),
+            tone: "success",
+          },
+          {
+            label: "Expenses",
+            value: formatMoney(totals.expense, { symbol: data.settings.currencySymbol }),
+          },
+          {
+            label: "Net",
+            value: formatMoney(totals.net, { symbol: data.settings.currencySymbol, sign: true }),
+            tone: totals.net >= 0 ? "success" : "danger",
+          },
+        ]}
+      />
 
       <FilterToolbar>
         <div className="relative min-w-0 flex-1">
@@ -143,7 +135,7 @@ function TransactionsContent() {
               onClick={() => setTypeFilter(tf)}
               className={cn(
                 dashSegmentItem,
-                "capitalize",
+                "flex-1 capitalize sm:flex-none",
                 typeFilter === tf ? dashSegmentItemActive : "hover:text-(--dash-text)",
               )}
             >
@@ -181,22 +173,21 @@ function TransactionsContent() {
           }
         />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {grouped.map(([date, txs]) => {
             const dayIncome = sumIncome(txs)
             const dayExpense = sumExpenses(txs)
 
             return (
-              <section key={date} className="space-y-3">
+              <section key={date} className="space-y-2">
                 <DateGroupHeader
                   date={date}
                   income={dayIncome}
                   expense={dayExpense}
                   currencySymbol={data.settings.currencySymbol}
-                  count={txs.length}
                 />
 
-                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+                <div className="space-y-2">
                   {txs.map((tx) => (
                     <TransactionRow key={tx.id} tx={tx} onEdit={ui.openEdit} showDate={false} />
                   ))}
@@ -208,8 +199,4 @@ function TransactionsContent() {
       )}
     </DashPage>
   )
-}
-
-export default function TransactionsPage() {
-  return <TransactionsContent />
 }

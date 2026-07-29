@@ -138,11 +138,11 @@ export function QuickAddBar() {
               key={p.id}
               type="button"
               onClick={() => handleQuickAddPreset(p)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-(--dash-muted) px-3 py-2.5 text-sm font-medium text-(--dash-text) transition-colors hover:bg-(--dash-muted-hover)"
+              className="inline-flex min-h-10 max-w-full items-center gap-1.5 rounded-xl bg-(--dash-muted) px-2.5 py-2 text-xs font-medium text-(--dash-text) transition-colors hover:bg-(--dash-muted-hover) sm:min-h-11 sm:gap-2 sm:px-3 sm:py-2.5 sm:text-sm"
             >
-              <Icon name={p.icon} className="size-4 text-(--dash-text-muted)" />
-              <span>{p.label}</span>
-              <span className="font-mono text-sm font-semibold text-(--dash-text-muted)">
+              <Icon name={p.icon} className="size-3.5 shrink-0 text-(--dash-text-muted) sm:size-4" />
+              <span className="truncate max-w-[100px] sm:max-w-none">{p.label}</span>
+              <span className="font-mono text-xs font-semibold text-(--dash-text-muted) sm:text-sm">
                 {formatMoney(p.amount, { symbol: data.settings.currencySymbol })}
               </span>
             </button>
@@ -156,7 +156,7 @@ export function QuickAddBar() {
             placeholder="e.g. Lunch 180 food bkash"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className={dashInput}
+            className={cn(dashInput, "text-xs sm:text-sm")}
           />
           {text ? (
             <button
@@ -169,17 +169,17 @@ export function QuickAddBar() {
             </button>
           ) : null}
         </div>
-        <Button type="submit" variant="dash" className="h-11 w-full shrink-0 px-5 sm:w-auto">
+        <Button type="submit" variant="dash" className="h-10 w-full shrink-0 px-5 sm:h-11 sm:w-auto">
           Log
         </Button>
       </form>
 
       {parsed && parsed.amount > 0 ? (
-        <div className={cn(dashMuted, "px-4 py-3 text-sm")}>
+        <div className={cn(dashMuted, "flex flex-wrap items-center gap-1.5 px-3 py-2.5 text-xs sm:px-4 sm:py-3 sm:text-sm")}>
           <span className="font-semibold text-(--dash-text)">{parsed.description}</span>
-          <span className="mx-2 text-(--dash-text-faint)">·</span>
+          <span className="text-(--dash-text-faint)">·</span>
           <span className="font-medium uppercase text-(--dash-text-muted)">{parsed.categoryId}</span>
-          <span className="mx-2 text-(--dash-text-faint)">·</span>
+          <span className="text-(--dash-text-faint)">·</span>
           <span className="font-mono font-bold text-(--dash-text)">
             {formatMoney(parsed.amount, { symbol: data.settings.currencySymbol })}
           </span>

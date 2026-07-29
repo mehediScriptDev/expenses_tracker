@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* ── Main column ── */}
         <div className="lg:pl-60">
           {/* Top header bar */}
-          <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3]/90 dark:bg-background/90 px-4 backdrop-blur-md sm:px-6">
+          <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3] dark:bg-background px-4 sm:px-6">
             <div className="flex items-center gap-3">
               <span className="lg:hidden">
                 <Brand />
@@ -182,7 +182,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          <main className="w-full px-4 pb-24 pt-6 sm:px-8 lg:px-10 lg:pb-10">
+          <main className="w-full px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-4 sm:px-6 sm:pt-6 lg:px-10 lg:pb-10">
             {hydrated ? children : <LoadingScreen />}
           </main>
         </div>

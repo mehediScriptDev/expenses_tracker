@@ -16,7 +16,6 @@ export function BorrowedSummary() {
     <DashboardCard
       title="Borrowed money"
       description="Outstanding loans and repayments"
-      className="h-full"
       action={
         <Link href="/borrowed" className={dashLink}>
           Manage

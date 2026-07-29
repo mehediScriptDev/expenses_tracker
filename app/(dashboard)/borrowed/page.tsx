@@ -10,8 +10,7 @@ import {
   dashSegmentItemActive,
   dashInput,
   DashPage,
-  StatTile,
-  StatGrid,
+  SummaryBar,
   FilterToolbar,
   PageHero,
   StatusBadge,
@@ -118,7 +117,7 @@ export default function BorrowedPage() {
         title="Borrowed & lent"
         description="Track money you owe and money others owe you, with due dates and repayment progress."
       >
-        <Button variant="dash" onClick={handleOpenAdd} className="gap-1.5">
+        <Button variant="dash" onClick={handleOpenAdd} className="h-11 w-full gap-1.5 px-5 sm:w-auto">
           <Icon name="plus" className="size-4" />
           Add record
         </Button>
@@ -142,35 +141,33 @@ export default function BorrowedPage() {
       >
         <div className="max-w-xl space-y-2">
           <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="font-medium text-[var(--dash-text-secondary)]">Overall repayment progress</span>
+            <span className="font-medium text-(--dash-text-secondary)">Overall repayment progress</span>
             <span className="font-semibold tabular-nums">{Math.round(totals.repaymentPct)}%</span>
           </div>
           <ProgressBar value={totals.repaymentPct} tone="accent" className="h-2.5" />
         </div>
       </PageHero>
 
-      <StatGrid>
-        <StatTile
-          icon="arrow-down-left"
-          label="I owe"
-          value={formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol })}
-          tone="danger"
-        />
-        <StatTile
-          icon="arrow-up-right"
-          label="Owed to me"
-          value={formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol })}
-          tone="success"
-        />
-        <StatTile
-          icon="clock-alert"
-          label="Overdue"
-          value={totals.overdue.length}
-          subtext={totals.overdue.length === 1 ? "item needs attention" : "items need attention"}
-          tone={totals.overdue.length > 0 ? "danger" : "default"}
-        />
-        <StatTile icon="hand-coins" label="Total records" value={data.loans.length} />
-      </StatGrid>
+      <SummaryBar
+        items={[
+          {
+            label: "I owe",
+            value: formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol }),
+            tone: "danger",
+          },
+          {
+            label: "Owed to me",
+            value: formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol }),
+            tone: "success",
+          },
+          {
+            label: "Overdue",
+            value: totals.overdue.length,
+            tone: totals.overdue.length > 0 ? "danger" : "default",
+          },
+          { label: "Records", value: data.loans.length },
+        ]}
+      />
 
       <FilterToolbar>
         <div className={cn(dashSegment, "w-full bg-[var(--dash-surface)] lg:w-auto")}>
@@ -513,7 +510,7 @@ function LoanDialog({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label className="dash-label">Total ({currencySymbol})</label>
               <Input
@@ -539,7 +536,7 @@ function LoanDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label className="dash-label">Date</label>
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={dashInput} required />

@@ -10,8 +10,7 @@ import {
   dashSegmentItemActive,
   dashInput,
   DashPage,
-  StatTile,
-  StatGrid,
+  SummaryBar,
   FilterToolbar,
   StatusBadge,
 } from "@/dashboard/shared"
@@ -93,23 +92,23 @@ export default function CategoriesPage() {
         title="Categories"
         description="Organize spending and income with custom icons, colors, and labels."
       >
-        <Button variant="dash" onClick={handleOpenAdd} className="gap-1.5">
+        <Button variant="dash" onClick={handleOpenAdd} className="h-11 w-full gap-1.5 px-5 sm:w-auto">
           <Icon name="plus" className="size-4" />
           Add category
         </Button>
       </PageHeader>
 
-      <StatGrid>
-        <StatTile icon="shapes" label="Expense" value={expenseCount} subtext="categories" />
-        <StatTile icon="wallet" label="Income" value={incomeCount} subtext="categories" tone="success" />
-        <StatTile
-          icon="receipt-text"
-          label="Activity"
-          value={formatMoney(filteredTotal, { symbol: data.settings.currencySymbol, compact: true })}
-          subtext="in current view"
-        />
-        <StatTile icon="target" label="Budgeted" value={budgetedCount} tone="accent" />
-      </StatGrid>
+      <SummaryBar
+        items={[
+          { label: "Expense", value: expenseCount },
+          { label: "Income", value: incomeCount, tone: "success" },
+          {
+            label: "Activity",
+            value: formatMoney(filteredTotal, { symbol: data.settings.currencySymbol, compact: true }),
+          },
+          { label: "Budgeted", value: budgetedCount, tone: "accent" },
+        ]}
+      />
 
       <FilterToolbar>
         <div className={cn(dashSegment, "w-full bg-[var(--dash-surface)] sm:w-auto")}>
@@ -183,12 +182,12 @@ export default function CategoriesPage() {
                   aria-hidden
                 />
 
-                <div className="flex items-start justify-between gap-3 p-5 pl-6">
+                <div className="flex items-start justify-between gap-3 p-4 pl-5 sm:p-5 sm:pl-6">
                   <div className="flex min-w-0 flex-1 items-start gap-3">
                     <CategoryBadge icon={cat.icon} color={cat.color} size="md" />
                     <div className="min-w-0 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="truncate text-base font-semibold text-[var(--dash-text)]">{cat.name}</h3>
+                        <h3 className="truncate text-base font-semibold text-(--dash-text)">{cat.name}</h3>
                         {cat.isCustom ? <StatusBadge tone="accent">Custom</StatusBadge> : null}
                         {isBudgeted ? <StatusBadge tone="neutral">Budgeted</StatusBadge> : null}
                       </div>
@@ -198,7 +197,7 @@ export default function CategoriesPage() {
                           <Icon name="receipt-text" className="size-3.5" />
                           {stat.count} tx
                         </span>
-                        <span className="font-mono font-semibold text-[var(--dash-text)]">
+                        <span className="font-mono font-semibold text-(--dash-text)">
                           {formatMoney(stat.total, { symbol: data.settings.currencySymbol })}
                         </span>
                         <span className="capitalize">{cat.kind}</span>

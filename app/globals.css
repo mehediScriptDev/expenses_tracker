@@ -216,75 +216,75 @@
   }
 
   .dash-card {
-    @apply overflow-hidden rounded-xl bg-[var(--dash-surface)] shadow-sm ring-1 ring-[var(--dash-border)];
+    @apply overflow-hidden rounded-xl bg-(--dash-surface) ring-1 ring-(--dash-border);
   }
 
   .dash-muted {
-    @apply rounded-xl bg-[var(--dash-muted)] shadow-none ring-1 ring-[var(--dash-border)];
+    @apply rounded-xl bg-(--dash-muted) shadow-none ring-1 ring-(--dash-border);
   }
 
   .dash-segment {
-    @apply flex flex-wrap items-center gap-1 rounded-xl bg-[var(--dash-muted)] p-1 ring-1 ring-[var(--dash-border)];
+    @apply flex flex-wrap items-center gap-1 rounded-xl bg-(--dash-muted) p-1 ring-1 ring-(--dash-border);
   }
 
   .dash-segment-item {
-    @apply rounded-lg px-3.5 py-2 text-sm font-medium text-[var(--dash-text-muted)] transition-all;
+    @apply rounded-lg px-3.5 py-2 text-sm font-medium text-(--dash-text-muted) transition-all;
   }
 
   .dash-segment-item-active {
-    @apply bg-[var(--dash-surface)] font-semibold text-[var(--dash-text)] shadow-sm ring-1 ring-[var(--dash-border-strong)];
+    @apply bg-(--dash-surface) font-semibold text-(--dash-text) shadow-sm ring-1 ring-(--dash-border-strong);
   }
 
   .dash-page {
-    @apply w-full space-y-6;
+    @apply w-full space-y-5 sm:space-y-6;
   }
 
   .dash-page-header {
-    @apply mb-1;
+    @apply mb-3 sm:mb-4;
   }
 
   .dash-page-title {
-    @apply text-[1.625rem] font-bold leading-tight tracking-tight text-[var(--dash-text)] sm:text-[1.875rem];
+    @apply text-2xl font-bold leading-tight tracking-tight text-(--dash-text) sm:text-[1.875rem];
   }
 
   .dash-page-desc {
-    @apply mt-1.5 text-[15px] leading-relaxed text-[var(--dash-text-secondary)];
+    @apply mt-1 text-sm leading-relaxed text-(--dash-text-secondary) sm:mt-1.5 sm:text-[15px];
   }
 
   .dash-section-title {
-    @apply text-base font-semibold leading-snug text-[var(--dash-text)];
+    @apply text-base font-semibold leading-snug text-(--dash-text);
   }
 
   .dash-label {
-    @apply text-sm font-semibold leading-none text-[var(--dash-text-secondary)];
+    @apply text-sm font-semibold leading-none text-(--dash-text-secondary);
   }
 
   .dash-caption {
-    @apply text-sm leading-relaxed text-[var(--dash-text-muted)];
+    @apply text-sm leading-relaxed text-(--dash-text-muted);
   }
 
   .dash-meta {
-    @apply text-xs font-bold uppercase tracking-wide text-[var(--dash-accent)];
+    @apply text-xs font-bold uppercase tracking-wide text-(--dash-accent);
   }
 
   .dash-link {
-    @apply text-sm font-semibold text-[var(--dash-accent)] transition-colors hover:text-[#123a6e];
+    @apply text-sm font-semibold text-(--dash-accent) transition-colors hover:text-[#123a6e];
   }
 
   .dash-input {
-    @apply h-11 rounded-xl border border-[var(--dash-border)] bg-[var(--dash-surface)] text-sm text-[var(--dash-text)] shadow-sm ring-0 placeholder:text-[var(--dash-text-faint)];
+    @apply h-11 rounded-xl border border-(--dash-border) bg-(--dash-surface) text-sm text-(--dash-text) shadow-sm ring-0 placeholder:text-(--dash-text-faint);
   }
 
   .dash-stat-value {
-    @apply font-mono text-xl font-bold tabular-nums tracking-tight text-[var(--dash-text)] sm:text-2xl;
+    @apply font-mono text-xl font-bold tabular-nums tracking-tight text-(--dash-text) sm:text-2xl;
   }
 
   .dash-hero-value {
-    @apply font-mono text-4xl font-bold tabular-nums tracking-tight text-[var(--dash-text)] sm:text-[2.75rem] sm:leading-none;
+    @apply font-mono text-3xl font-bold tabular-nums tracking-tight text-(--dash-text) sm:text-[2.75rem] sm:leading-none;
   }
 
   .dash-hero {
-    @apply overflow-hidden rounded-xl bg-gradient-to-br from-[var(--dash-accent-soft)]/55 via-[var(--dash-surface)] to-[var(--dash-surface)] p-5 shadow-sm ring-1 ring-[var(--dash-border)] sm:p-7;
+    @apply overflow-hidden rounded-xl bg-(--dash-surface) p-4 ring-1 ring-(--dash-border) sm:p-6;
   }
 }
 

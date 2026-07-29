@@ -7,8 +7,7 @@ import {
   ProgressBar,
   CategoryBadge,
   DashPage,
-  StatTile,
-  StatGrid,
+  SummaryBar,
   PageHero,
   DashboardCard,
   dashMeta,
@@ -112,9 +111,9 @@ export default function InsightsPage() {
         value={formatMoney(metrics.safeDailyLimit, { symbol: data.settings.currencySymbol })}
         caption={
           <>
-            <strong className="font-semibold text-[var(--dash-text)]">{metrics.daysRemaining} days</strong> left in
+            <strong className="font-semibold text-(--dash-text)">{metrics.daysRemaining} days</strong> left in
             this salary cycle with{" "}
-            <strong className="font-semibold text-[var(--dash-text)]">
+            <strong className="font-semibold text-(--dash-text)">
               {formatMoney(metrics.remainingSalary, { symbol: data.settings.currencySymbol })}
             </strong>{" "}
             remaining salary.
@@ -139,30 +138,28 @@ export default function InsightsPage() {
         </div>
       </PageHero>
 
-      <StatGrid>
-        <StatTile
-          icon="calendar-range"
-          label="This month"
-          value={formatMoney(metrics.monthSpending, { symbol: data.settings.currencySymbol, compact: true })}
-        />
-        <StatTile
-          icon="sun"
-          label="Today"
-          value={formatMoney(metrics.todaySpending, { symbol: data.settings.currencySymbol, compact: true })}
-        />
-        <StatTile
-          icon="hand-coins"
-          label="Borrowed"
-          value={formatMoney(metrics.borrowedOutstanding, { symbol: data.settings.currencySymbol, compact: true })}
-          tone={metrics.borrowedOutstanding > 0 ? "danger" : "default"}
-        />
-        <StatTile
-          icon="sparkles"
-          label="Smart alerts"
-          value={alertCount}
-          tone={alertCount > 0 ? "warning" : "success"}
-        />
-      </StatGrid>
+      <SummaryBar
+        items={[
+          {
+            label: "This month",
+            value: formatMoney(metrics.monthSpending, { symbol: data.settings.currencySymbol, compact: true }),
+          },
+          {
+            label: "Today",
+            value: formatMoney(metrics.todaySpending, { symbol: data.settings.currencySymbol, compact: true }),
+          },
+          {
+            label: "Borrowed",
+            value: formatMoney(metrics.borrowedOutstanding, { symbol: data.settings.currencySymbol, compact: true }),
+            tone: metrics.borrowedOutstanding > 0 ? "danger" : "default",
+          },
+          {
+            label: "Alerts",
+            value: alertCount,
+            tone: alertCount > 0 ? "warning" : "success",
+          },
+        ]}
+      />
 
       <DashboardCard
         title="Smart financial alerts"
@@ -190,7 +187,7 @@ export default function InsightsPage() {
                     <Icon name={w.icon} className="size-5" />
                   </span>
                   <div className="min-w-0 space-y-1">
-                    <h4 className="text-sm font-semibold text-[var(--dash-text)]">{w.title}</h4>
+                    <h4 className="text-sm font-semibold text-(--dash-text)">{w.title}</h4>
                     {w.detail ? <p className="text-xs leading-relaxed text-[var(--dash-text-secondary)]">{w.detail}</p> : null}
                   </div>
                 </article>
@@ -217,7 +214,7 @@ export default function InsightsPage() {
                     <Icon name={ins.icon} className="size-5" />
                   </span>
                   <div className="min-w-0 space-y-1">
-                    <h4 className="text-sm font-semibold text-[var(--dash-text)]">{ins.title}</h4>
+                    <h4 className="text-sm font-semibold text-(--dash-text)">{ins.title}</h4>
                     {ins.detail ? (
                       <p className="text-xs leading-relaxed text-[var(--dash-text-secondary)]">{ins.detail}</p>
                     ) : null}

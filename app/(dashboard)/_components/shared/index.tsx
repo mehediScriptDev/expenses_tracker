@@ -22,6 +22,7 @@ export {
 export {
   StatTile,
   StatGrid,
+  SummaryBar,
   FilterToolbar,
   DateGroupHeader,
   StatusBadge,
@@ -87,17 +88,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-4 rounded-xl bg-[var(--dash-accent-soft)]/35 px-6 py-14 text-center ring-1 ring-[var(--dash-border)]",
+        "flex flex-col items-center justify-center gap-4 rounded-xl bg-(--dash-accent-soft)/35 px-4 py-10 text-center ring-1 ring-(--dash-border) sm:px-6 sm:py-14",
         className,
       )}
     >
-      <div className="flex size-14 items-center justify-center rounded-full bg-[var(--dash-surface)] text-[var(--dash-accent)] shadow-sm ring-1 ring-[var(--dash-border)]">
+      <div className="flex size-14 items-center justify-center rounded-full bg-(--dash-surface) text-(--dash-accent) shadow-sm ring-1 ring-(--dash-border)">
         <Icon name={icon} className="size-7" />
       </div>
       <div className="space-y-2">
-        <p className="text-base font-semibold text-[var(--dash-text)] text-balance">{title}</p>
+        <p className="text-base font-semibold text-(--dash-text) text-balance">{title}</p>
         {message ? (
-          <p className="mx-auto max-w-sm text-sm leading-relaxed text-[var(--dash-text-secondary)] text-pretty">{message}</p>
+          <p className="mx-auto max-w-sm text-sm leading-relaxed text-(--dash-text-secondary) text-pretty">{message}</p>
         ) : null}
       </div>
       {action}
@@ -117,7 +118,7 @@ export function PageHeader({
   children?: React.ReactNode
 }) {
   return (
-    <div className="dash-page-header flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="dash-page-header mb-3 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       <div className="min-w-0">
         <h1 className="dash-page-title">{title}</h1>
         {description ? <p className="dash-page-desc">{description}</p> : null}
@@ -165,7 +166,7 @@ export function CategoryBadge({
       >
         <Icon name={icon} className={ic} />
       </span>
-      {name ? <span className="text-sm font-semibold text-[var(--dash-text)]">{name}</span> : null}
+      {name ? <span className="text-sm font-semibold text-(--dash-text)">{name}</span> : null}
     </span>
   )
 }

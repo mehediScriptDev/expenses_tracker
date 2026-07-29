@@ -6,8 +6,7 @@ import {
   EmptyState,
   ProgressBar,
   DashPage,
-  StatTile,
-  StatGrid,
+  SummaryBar,
   PageHero,
   StatusBadge,
   DashboardCard,
@@ -143,7 +142,7 @@ export default function GoalsPage() {
         title="Savings goals"
         description="Set targets, track progress, and build toward what matters most."
       >
-        <Button variant="dash" onClick={handleOpenAdd} className="gap-1.5">
+        <Button variant="dash" onClick={handleOpenAdd} className="h-11 w-full gap-1.5 px-5 sm:w-auto">
           <Icon name="plus" className="size-4" />
           Add goal
         </Button>
@@ -155,7 +154,7 @@ export default function GoalsPage() {
         caption={
           <>
             Target across all goals:{" "}
-            <strong className="font-semibold text-[var(--dash-text)]">
+            <strong className="font-semibold text-(--dash-text)">
               {formatMoney(totalTarget, { symbol: data.settings.currencySymbol })}
             </strong>{" "}
             · {completedCount} of {goals.length} completed
@@ -171,26 +170,25 @@ export default function GoalsPage() {
         </div>
       </PageHero>
 
-      <StatGrid>
-        <StatTile icon="trophy" label="Active goals" value={goals.length} />
-        <StatTile
-          icon="piggy-bank"
-          label="Total saved"
-          value={formatMoney(totalSaved, { symbol: data.settings.currencySymbol, compact: true })}
-          tone="success"
-        />
-        <StatTile
-          icon="target"
-          label="Total target"
-          value={formatMoney(totalTarget, { symbol: data.settings.currencySymbol, compact: true })}
-        />
-        <StatTile
-          icon="circle-check"
-          label="Completed"
-          value={`${completedCount}/${goals.length}`}
-          tone={completedCount > 0 ? "accent" : "default"}
-        />
-      </StatGrid>
+      <SummaryBar
+        items={[
+          { label: "Goals", value: goals.length },
+          {
+            label: "Saved",
+            value: formatMoney(totalSaved, { symbol: data.settings.currencySymbol, compact: true }),
+            tone: "success",
+          },
+          {
+            label: "Target",
+            value: formatMoney(totalTarget, { symbol: data.settings.currencySymbol, compact: true }),
+          },
+          {
+            label: "Completed",
+            value: `${completedCount}/${goals.length}`,
+            tone: completedCount > 0 ? "accent" : "default",
+          },
+        ]}
+      />
 
       {goals.length === 0 ? (
         <EmptyState
@@ -240,7 +238,7 @@ export default function GoalsPage() {
                         <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
                           Saved
                         </p>
-                        <p className="mt-1 font-mono text-xl font-bold tabular-nums text-[var(--dash-text)]">
+                        <p className="mt-1 font-mono text-xl font-bold tabular-nums text-(--dash-text)">
                           {formatMoney(g.currentAmount, { symbol: data.settings.currencySymbol })}
                         </p>
                       </div>
@@ -417,7 +415,7 @@ function GoalDialog({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label className="dash-label">Target ({currencySymbol})</label>
               <Input

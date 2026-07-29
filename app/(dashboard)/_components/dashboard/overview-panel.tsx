@@ -29,8 +29,8 @@ export function OverviewPanel() {
 
   return (
     <section className="dash-hero">
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0 flex-1 space-y-5">
+      <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0 flex-1 space-y-4 sm:space-y-5">
           <div>
             <p className={dashLabel}>Available balance</p>
             <p className={cn(dashHeroValue, "mt-2")}>
@@ -68,16 +68,16 @@ export function OverviewPanel() {
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-2 min-w-0 sm:mt-6 sm:gap-3 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-(--dash-surface) px-4 py-4 shadow-sm ring-1 ring-(--dash-border) sm:px-5 sm:py-5">
-            <div className="flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-(--dash-accent-soft) text-(--dash-accent)">
-                <Icon name={stat.icon} className="size-4" aria-hidden />
+          <div key={stat.label} className="min-w-0 overflow-hidden rounded-xl bg-(--dash-surface) p-2.5 ring-1 ring-(--dash-border) sm:p-4">
+            <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-(--dash-accent-soft) text-(--dash-accent) sm:size-8">
+                <Icon name={stat.icon} className="size-3.5 sm:size-4" aria-hidden />
               </span>
-              <p className={dashMeta}>{stat.label}</p>
+              <p className={cn(dashMeta, "min-w-0 flex-1 truncate text-[10px] tracking-normal sm:text-xs sm:tracking-wide")}>{stat.label}</p>
             </div>
-            <p className={cn(dashStatValue, "mt-2 truncate")}>{stat.value}</p>
+            <p className={cn(dashStatValue, "mt-1.5 truncate text-base font-bold sm:mt-2 sm:text-xl")}>{stat.value}</p>
           </div>
         ))}
       </div>

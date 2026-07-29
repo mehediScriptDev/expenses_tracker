@@ -9,7 +9,7 @@ import {
   dashInput,
   DashPage,
   DashboardCard,
-  dashMuted,
+  SummaryBar,
 } from "@/dashboard/shared"
 import { QuickAddPresetsManager } from "@/dashboard/quick-add-presets-manager"
 import { useStore } from "@/lib/store"
@@ -136,10 +136,10 @@ export default function SettingsPage() {
   }
 
   const stats = [
-    { label: "Transactions", value: data.transactions.length, icon: "receipt-text" },
-    { label: "Categories", value: data.categories.length, icon: "shapes" },
-    { label: "Budgets", value: Object.keys(data.budgets).length, icon: "target" },
-    { label: "Loans", value: data.loans.length, icon: "hand-coins" },
+    { label: "Transactions", value: data.transactions.length },
+    { label: "Categories", value: data.categories.length },
+    { label: "Budgets", value: Object.keys(data.budgets).length },
+    { label: "Loans", value: data.loans.length },
   ]
 
   return (
@@ -149,17 +149,7 @@ export default function SettingsPage() {
         description="Configure your financial profile, quick-add shortcuts, and data backup."
       />
 
-      <div className={cn(dashMuted, "grid grid-cols-2 gap-3 p-4 sm:grid-cols-4")}>
-        {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-(--dash-surface) px-4 py-3 shadow-sm ring-1 ring-(--dash-border)">
-            <div className="flex items-center gap-2 text-(--dash-accent)">
-              <Icon name={stat.icon} className="size-3.5" aria-hidden />
-              <span className="text-xs font-bold uppercase tracking-wide">{stat.label}</span>
-            </div>
-            <p className="mt-2 font-mono text-xl font-bold tabular-nums text-(--dash-text)">{stat.value}</p>
-          </div>
-        ))}
-      </div>
+      <SummaryBar items={stats.map((s) => ({ label: s.label, value: s.value }))} />
 
       <SettingsSection
         icon="zap"

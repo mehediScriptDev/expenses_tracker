@@ -13,13 +13,13 @@ export default function DashboardPage() {
     <DashPage>
       <OverviewPanel />
 
-      <div className="grid gap-6 xl:grid-cols-12">
-        <div className="space-y-6 xl:col-span-8">
+      <div className="grid w-full min-w-0 gap-4 sm:gap-6 xl:grid-cols-12">
+        <div className="w-full min-w-0 space-y-4 sm:space-y-6 xl:col-span-8">
           <CategoryBreakdown />
           <RecentTransactions />
         </div>
 
-        <aside className="space-y-6 xl:col-span-4 xl:sticky xl:top-18 xl:self-start">
+        <aside className="w-full min-w-0 space-y-4 sm:space-y-6 xl:col-span-4 xl:sticky xl:top-14 xl:self-start">
           <QuickAddBar />
           <WarningsBanner />
           <BorrowedSummary />
