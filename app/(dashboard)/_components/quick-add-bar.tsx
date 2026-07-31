@@ -150,13 +150,13 @@ export function QuickAddBar() {
         </div>
       )}
 
-      <form onSubmit={handleSmartSubmit} className="flex flex-col gap-2 sm:flex-row">
+      <form onSubmit={handleSmartSubmit} className="flex flex-col gap-2 sm:flex-row items-stretch">
         <div className="relative min-w-0 flex-1">
           <Input
             placeholder="e.g. Lunch 180 food bkash"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className={cn(dashInput, "text-xs sm:text-sm")}
+            className={cn("h-11", dashInput, "w-full text-xs sm:text-sm")}
           />
           {text ? (
             <button
@@ -169,7 +169,7 @@ export function QuickAddBar() {
             </button>
           ) : null}
         </div>
-        <Button type="submit" variant="dash" className="h-10 w-full shrink-0 px-5 sm:h-11 sm:w-auto">
+        <Button type="submit" variant="dash" className="h-11 w-full shrink-0 px-6 sm:w-auto">
           Log
         </Button>
       </form>

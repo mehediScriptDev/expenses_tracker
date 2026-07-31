@@ -93,14 +93,14 @@ export function OverviewPanel() {
         <div className="flex shrink-0 flex-col gap-2.5 sm:flex-row lg:flex-col xl:flex-row">
           <Button
             onClick={ui.openAdd}
-            className="h-11 w-full px-6 sm:w-auto lg:w-full xl:w-auto bg-[#FFC700] hover:bg-[#E6B400] text-neutral-950 font-extrabold shadow-2xs border-0 cursor-pointer"
+            className="h-11 w-full px-6 sm:w-auto lg:w-full xl:w-auto shadow-2xs"
           >
             <Icon name="plus" className="size-4" />
             Add transaction
           </Button>
           <Button
             variant="outline"
-            className="h-11 w-full px-6 sm:w-auto lg:w-full xl:w-auto border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 font-bold"
+            className="h-11 w-full px-6 sm:w-auto lg:w-full xl:w-auto border-neutral-200 dark:border-neutral-800 shadow-2xs"
             asChild
           >
             <Link href="/insights">View insights</Link>

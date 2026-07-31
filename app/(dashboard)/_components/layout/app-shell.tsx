@@ -61,14 +61,14 @@ function UserMenu() {
 
       {open && (
         <div
-          className="absolute right-0 mt-2 w-52 rounded-xl bg-white p-4 z-50 font-mono text-xs text-neutral-800 text-left animate-in fade-in zoom-in-95 duration-100"
+          className="absolute right-0 mt-2 w-56 rounded-lg bg-white dark:bg-card border border-neutral-200 dark:border-neutral-800 p-1.5 shadow-lg z-50 text-sm font-semibold text-neutral-800 dark:text-neutral-200 text-left animate-in fade-in zoom-in-95 duration-100"
           onMouseLeave={() => setOpen(false)}
         >
-          <div className="space-y-3">
+          <div className="space-y-0.5">
             <Link
               href="/settings"
               onClick={() => setOpen(false)}
-              className="block font-medium text-neutral-800 hover:text-black transition-colors"
+              className="block rounded-md px-3 py-2 text-sm sm:text-base font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
               Account Settings
             </Link>
@@ -76,12 +76,12 @@ function UserMenu() {
             <Link
               href="/"
               onClick={() => setOpen(false)}
-              className="block font-medium text-neutral-800 hover:text-black transition-colors"
+              className="block rounded-md px-3 py-2 text-sm sm:text-base font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
               Home Page
             </Link>
 
-            <div className="border-t border-neutral-200 pt-3">
+            <div className="border-t border-neutral-200 dark:border-neutral-800 my-1 pt-1">
               <button
                 type="button"
                 onClick={() => {
@@ -89,7 +89,7 @@ function UserMenu() {
                   logout()
                   router.push("/")
                 }}
-                className="block w-full text-left font-medium text-neutral-700 hover:text-black transition-colors cursor-pointer"
+                className="block w-full rounded-md px-3 py-2 text-left text-sm sm:text-base font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
               >
                 Logout
               </button>
