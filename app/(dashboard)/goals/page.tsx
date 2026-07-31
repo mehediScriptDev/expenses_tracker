@@ -12,6 +12,7 @@ import {
   DashboardCard,
   dashInput,
   Pagination,
+  FilterToolbar,
 } from "@/dashboard/shared"
 import { useStore } from "@/lib/store"
 import { formatMoney, relativeDay } from "@/lib/format"
@@ -100,8 +101,15 @@ export default function GoalsPage() {
   const [targetGoal, setTargetGoal] = React.useState<Goal | null>(null)
   const [depositAmt, setDepositAmt] = React.useState("")
 
+  const [search, setSearch] = React.useState("")
+  const [statusFilter, setStatusFilter] = React.useState<"all" | "in-progress" | "completed">("all")
+
   const [currentPage, setCurrentPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(6)
+
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [search, statusFilter])
 
   const totalTarget = React.useMemo(() => goals.reduce((s, g) => s + g.targetAmount, 0), [goals])
   const totalSaved = React.useMemo(() => goals.reduce((s, g) => s + g.currentAmount, 0), [goals])
@@ -112,15 +120,40 @@ export default function GoalsPage() {
   const totalRemaining = Math.max(0, totalTarget - totalSaved)
   const overallPct = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0
 
-  const totalPages = Math.ceil(goals.length / pageSize) || 1
+  const filteredGoals = React.useMemo(() => {
+    return goals.filter((g) => {
+      if (search.trim()) {
+        const q = search.toLowerCase().trim()
+        if (!g.title.toLowerCase().includes(q)) return false
+      }
+
+      const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0
+      const isCompleted = pct >= 100
+
+      if (statusFilter === "in-progress") {
+        if (isCompleted) return false
+      } else if (statusFilter === "completed") {
+        if (!isCompleted) return false
+      }
+
+      return true
+    })
+  }, [goals, search, statusFilter])
+
+  const totalPages = Math.ceil(filteredGoals.length / pageSize) || 1
 
   const paginatedGoals = React.useMemo(() => {
     const start = (currentPage - 1) * pageSize
-    return goals.slice(start, start + pageSize)
-  }, [goals, currentPage, pageSize])
+    return filteredGoals.slice(start, start + pageSize)
+  }, [filteredGoals, currentPage, pageSize])
 
   const handleOpenAdd = () => {
     setEditingGoal(null)
+    setAddModalOpen(true)
+  }
+
+  const handleOpenEdit = (g: Goal) => {
+    setEditingGoal(g)
     setAddModalOpen(true)
   }
 
@@ -255,108 +288,280 @@ export default function GoalsPage() {
         />
       ) : (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {paginatedGoals.map((g) => {
-              const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0
-              const isCompleted = pct >= 100
-              const remaining = Math.max(0, g.targetAmount - g.currentAmount)
+          <FilterToolbar>
+            <div className="relative min-w-0 flex-1 sm:max-w-xs">
+              <Icon
+                name="search"
+                className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--dash-text-faint)]"
+              />
+              <Input
+                placeholder="Search goals..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={cn(dashInput, "h-11 border-0 bg-[var(--dash-surface)] pl-10 shadow-none")}
+              />
+            </div>
 
-              return (
-                <DashboardCard
-                  key={g.id}
-                  title={g.title}
-                  description={
-                    g.targetDate
-                      ? `Target ${relativeDay(g.targetDate)} · ${g.targetDate}`
-                      : "No target date set"
-                  }
-                  action={
-                    isCompleted ? (
-                      <StatusBadge tone="success" icon="trophy">
-                        Completed
-                      </StatusBadge>
-                    ) : (
-                      <StatusBadge tone="accent">{Math.round(pct)}%</StatusBadge>
-                    )
-                  }
-                  bodyClassName="space-y-4"
-                >
-                  <div className="flex items-center gap-4">
-                    <span
-                      className="flex size-12 shrink-0 items-center justify-center rounded-xl text-white shadow-2xs"
-                      style={{ backgroundColor: g.color }}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              className="dash-input h-11 w-full pl-3.5 pr-10 text-sm sm:w-auto rounded-xl cursor-pointer"
+            >
+              <option value="all">All statuses</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </FilterToolbar>
+
+          {filteredGoals.length === 0 ? (
+            <EmptyState
+              icon="search"
+              title="No goals match your filters"
+              message="Try resetting your search query or choosing another status filter."
+            />
+          ) : (
+            <>
+              {/* Mobile Grid View (Visible on mobile screens) */}
+              <div className="sm:hidden grid gap-4">
+                {paginatedGoals.map((g) => {
+                  const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0
+                  const isCompleted = pct >= 100
+                  const remaining = Math.max(0, g.targetAmount - g.currentAmount)
+
+                  return (
+                    <DashboardCard
+                      key={g.id}
+                      title={g.title}
+                      description={
+                        g.targetDate
+                          ? `Target ${relativeDay(g.targetDate)} · ${g.targetDate}`
+                          : "No target date set"
+                      }
+                      action={
+                        isCompleted ? (
+                          <StatusBadge tone="success" icon="trophy">
+                            Completed
+                          </StatusBadge>
+                        ) : (
+                          <StatusBadge tone="accent">{Math.round(pct)}%</StatusBadge>
+                        )
+                      }
+                      bodyClassName="space-y-4"
                     >
-                      <Icon name={g.icon || "piggy-bank"} className="size-5" />
-                    </span>
+                      <div className="flex items-center gap-4">
+                        <span
+                          className="flex size-12 shrink-0 items-center justify-center rounded-xl text-white shadow-2xs"
+                          style={{ backgroundColor: g.color }}
+                        >
+                          <Icon name={g.icon || "piggy-bank"} className="size-5" />
+                        </span>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-end justify-between gap-3">
-                        <div>
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                            Saved
-                          </p>
-                          <p className="mt-1 font-mono text-xl font-black tabular-nums text-slate-900 dark:text-slate-50">
-                            {formatMoney(g.currentAmount, { symbol: data.settings.currencySymbol })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                            Target
-                          </p>
-                          <p className="mt-1 font-mono text-base font-bold tabular-nums text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg">
-                            {formatMoney(g.targetAmount, { symbol: data.settings.currencySymbol })}
-                          </p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-end justify-between gap-3">
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                Saved
+                              </p>
+                              <p className="mt-1 font-mono text-xl font-black tabular-nums text-slate-900 dark:text-slate-50">
+                                {formatMoney(g.currentAmount, { symbol: data.settings.currencySymbol })}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                Target
+                              </p>
+                              <p className="mt-1 font-mono text-base font-bold tabular-nums text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg">
+                                {formatMoney(g.targetAmount, { symbol: data.settings.currencySymbol })}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <ProgressBar value={pct} tone={isCompleted ? "success" : "accent"} className="h-3" />
+                      <ProgressBar value={pct} tone={isCompleted ? "success" : "accent"} className="h-3" />
 
-                  <div className="flex items-center justify-between text-xs font-semibold">
-                    {isCompleted ? (
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
-                        Target achieved — great work!
-                      </span>
-                    ) : (
-                      <span className="font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
-                        {formatMoney(remaining, { symbol: data.settings.currencySymbol })} remaining
-                      </span>
-                    )}
-                    <span className="font-mono text-slate-500 dark:text-slate-400">
-                      {Math.round(pct)}%
-                    </span>
-                  </div>
+                      <div className="flex items-center justify-between text-xs font-semibold">
+                        {isCompleted ? (
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
+                            Target achieved — great work!
+                          </span>
+                        ) : (
+                          <span className="font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
+                            {formatMoney(remaining, { symbol: data.settings.currencySymbol })} remaining
+                          </span>
+                        )}
+                        <span className="font-mono text-slate-500 dark:text-slate-400">
+                          {Math.round(pct)}%
+                        </span>
+                      </div>
 
-                  <div className="flex gap-2 pt-1">
-                    <Button
-                      size="sm"
-                      variant="dash"
-                      className="h-11 flex-1 gap-1.5 text-xs font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
-                      onClick={() => handleOpenDeposit(g)}
-                    >
-                      <Icon name="plus" className="size-3.5" />
-                      Deposit / save
-                    </Button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteGoal(g.id)}
-                      aria-label={`Delete ${g.title}`}
-                      className="flex size-11 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-400 hover:border-rose-600 hover:bg-rose-600 hover:text-white dark:hover:border-rose-600 dark:hover:bg-rose-600 transition-all cursor-pointer"
-                    >
-                      <Icon name="trash-2" className="size-4" />
-                    </button>
-                  </div>
-                </DashboardCard>
-              )
-            })}
-          </div>
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          size="sm"
+                          variant="dash"
+                          className="h-11 flex-1 gap-1.5 text-xs font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
+                          onClick={() => handleOpenDeposit(g)}
+                        >
+                          <Icon name="plus" className="size-3.5" />
+                          Deposit / save
+                        </Button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(g)}
+                          aria-label={`Edit ${g.title}`}
+                          className="flex size-11 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-black transition-all cursor-pointer shadow-2xs"
+                        >
+                          <Icon name="pencil" className="size-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteGoal(g.id)}
+                          aria-label={`Delete ${g.title}`}
+                          className="flex size-11 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-400 hover:border-rose-600 hover:bg-rose-600 hover:text-white dark:hover:border-rose-600 dark:hover:bg-rose-600 transition-all cursor-pointer"
+                        >
+                          <Icon name="trash-2" className="size-4" />
+                        </button>
+                      </div>
+                    </DashboardCard>
+                  )
+                })}
+              </div>
+
+              {/* Desktop Data Table (Visible on tablet & desktop screens) */}
+              <div className="hidden sm:block overflow-hidden rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-card shadow-2xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-neutral-50/80 dark:bg-neutral-900/50 border-b border-neutral-200/80 dark:border-neutral-800 text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                      <tr>
+                        <th scope="col" className="py-3.5 pl-5 pr-3">Goal</th>
+                        <th scope="col" className="px-3 py-3.5 text-center">Saved</th>
+                        <th scope="col" className="px-3 py-3.5 text-center">Target</th>
+                        <th scope="col" className="px-3 py-3.5">Progress</th>
+                        <th scope="col" className="px-3 py-3.5">Target Date</th>
+                        <th scope="col" className="py-3.5 pl-3 pr-5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60 font-medium">
+                      {paginatedGoals.map((g) => {
+                        const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0
+                        const isCompleted = pct >= 100
+                        const remaining = Math.max(0, g.targetAmount - g.currentAmount)
+
+                        return (
+                          <tr
+                            key={g.id}
+                            className="hover:bg-neutral-50/70 dark:hover:bg-neutral-900/40 transition-colors"
+                          >
+                            {/* Goal Icon & Title */}
+                            <td className="py-3.5 pl-5 pr-3">
+                              <div className="flex items-center gap-3">
+                                <span
+                                  className="flex size-9 shrink-0 items-center justify-center rounded-xl text-white shadow-2xs"
+                                  style={{ backgroundColor: g.color }}
+                                >
+                                  <Icon name={g.icon || "piggy-bank"} className="size-4.5" />
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-neutral-900 dark:text-neutral-100 truncate">{g.title}</p>
+                                  {isCompleted ? (
+                                    <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                      Completed
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Saved Amount */}
+                            <td className="px-3 py-3.5 whitespace-nowrap text-center font-mono font-black text-neutral-900 dark:text-neutral-50">
+                              {formatMoney(g.currentAmount, { symbol: data.settings.currencySymbol })}
+                            </td>
+
+                            {/* Target Amount */}
+                            <td className="px-3 py-3.5 whitespace-nowrap text-center font-mono text-neutral-600 dark:text-neutral-400">
+                              {formatMoney(g.targetAmount, { symbol: data.settings.currencySymbol })}
+                            </td>
+
+                            {/* Progress Bar & Percentage */}
+                            <td className="px-3 py-3.5">
+                              <div className="max-w-[160px] space-y-1">
+                                <div className="flex items-center justify-between text-[10px]">
+                                  <span className="text-neutral-500 font-semibold">{Math.round(pct)}%</span>
+                                  {!isCompleted && (
+                                    <span className="text-neutral-400 font-medium">
+                                      {formatMoney(remaining, { symbol: data.settings.currencySymbol })} left
+                                    </span>
+                                  )}
+                                </div>
+                                <ProgressBar value={pct} tone={isCompleted ? "success" : "accent"} className="h-1.5" />
+                              </div>
+                            </td>
+
+                            {/* Target Date */}
+                            <td className="px-3 py-3.5 whitespace-nowrap text-xs text-neutral-500 dark:text-neutral-400">
+                              {g.targetDate ? (
+                                <div className="space-y-0.5">
+                                  <p className="font-semibold text-neutral-700 dark:text-neutral-300">{relativeDay(g.targetDate)}</p>
+                                  <p className="text-[10px] text-neutral-400">{g.targetDate}</p>
+                                </div>
+                              ) : (
+                                <span className="text-neutral-400">No target date</span>
+                              )}
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3.5 pl-3 pr-5 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {/* Deposit Button */}
+                                <Button
+                                  size="xs"
+                                  variant="dash"
+                                  className="h-8 gap-1 px-2.5 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
+                                  onClick={() => handleOpenDeposit(g)}
+                                  title="Deposit / Save"
+                                >
+                                  <Icon name="plus" className="size-3" />
+                                  Deposit
+                                </Button>
+
+                                {/* Edit Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(g)}
+                                  className="flex size-8 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-black transition-all cursor-pointer shadow-2xs"
+                                  title="Edit goal"
+                                  aria-label={`Edit ${g.title}`}
+                                >
+                                  <Icon name="pencil" className="size-3.5" />
+                                </button>
+
+                                {/* Delete Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteGoal(g.id)}
+                                  className="flex size-8 items-center justify-center rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all cursor-pointer shadow-2xs"
+                                  title="Delete goal"
+                                  aria-label={`Delete ${g.title}`}
+                                >
+                                  <Icon name="trash-2" className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
 
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
-            totalItems={goals.length}
+            totalItems={filteredGoals.length}
             pageSize={pageSize}
             onPageSizeChange={setPageSize}
             pageSizeOptions={[6, 12, 24, 48]}

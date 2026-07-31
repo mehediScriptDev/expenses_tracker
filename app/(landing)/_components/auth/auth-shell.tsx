@@ -4,6 +4,8 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Icon } from "@/lib/icon"
+import { LEGAL_TERMS, PRIVACY_POLICY } from "../../_data/legal"
+import { LegalDialog } from "../legal-dialog"
 
 interface AuthShellProps {
   progress?: number
@@ -145,17 +147,31 @@ export function GoogleAuthButton({ onClick }: { onClick: () => void }) {
 }
 
 export function AuthTerms() {
+  const [activeDocument, setActiveDocument] = React.useState<any>(null)
+
   return (
-    <p className="text-center text-[11px] leading-relaxed text-neutral-500 pt-1">
-      By continuing, you agree to our{" "}
-      <Link href="/#faq" className="underline underline-offset-2 hover:text-neutral-800">
-        Terms of Use
-      </Link>{" "}
-      and{" "}
-      <Link href="/#faq" className="underline underline-offset-2 hover:text-neutral-800">
-        Privacy Policy
-      </Link>
-      .
-    </p>
+    <>
+      <p className="text-center text-[11px] leading-relaxed text-neutral-500 pt-1">
+        By continuing, you agree to our{" "}
+        <button
+          type="button"
+          onClick={() => setActiveDocument(LEGAL_TERMS)}
+          className="underline underline-offset-2 hover:text-neutral-800 cursor-pointer font-semibold"
+        >
+          Terms of Use
+        </button>{" "}
+        and{" "}
+        <button
+          type="button"
+          onClick={() => setActiveDocument(PRIVACY_POLICY)}
+          className="underline underline-offset-2 hover:text-neutral-800 cursor-pointer font-semibold"
+        >
+          Privacy Policy
+        </button>
+        .
+      </p>
+
+      <LegalDialog document={activeDocument} onClose={() => setActiveDocument(null)} />
+    </>
   )
 }

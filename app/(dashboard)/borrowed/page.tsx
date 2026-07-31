@@ -254,7 +254,7 @@ export default function BorrowedPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-            className="dash-input h-11 w-full px-3.5 text-sm sm:w-auto rounded-xl"
+            className="dash-input h-11 w-full pl-3.5 pr-10 text-sm sm:w-auto rounded-xl cursor-pointer"
           >
             <option value="all">All statuses</option>
             <option value="unpaid">Outstanding</option>
@@ -277,7 +277,8 @@ export default function BorrowedPage() {
         />
       ) : (
         <div className="space-y-6">
-          <div className="grid gap-4 lg:grid-cols-2">
+          {/* Mobile Grid View (Visible on mobile screens) */}
+          <div className="sm:hidden grid gap-4">
             {paginatedLoans.map((loan) => {
               const status = loanStatus(loan)
               const remaining = loanRemaining(loan)
@@ -407,6 +408,161 @@ export default function BorrowedPage() {
                 </DashboardCard>
               )
             })}
+          </div>
+
+          {/* Desktop Data Table (Visible on tablet & desktop screens) */}
+          <div className="hidden sm:block overflow-hidden rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-card shadow-2xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-neutral-50/80 dark:bg-neutral-900/50 border-b border-neutral-200/80 dark:border-neutral-800 text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                  <tr>
+                    <th scope="col" className="py-3.5 pl-5 pr-3">Person</th>
+                    <th scope="col" className="px-3 py-3.5">Direction</th>
+                    <th scope="col" className="px-3 py-3.5">Reason</th>
+                    <th scope="col" className="px-3 py-3.5">Repayment Progress</th>
+                    <th scope="col" className="px-3 py-3.5">Due Date</th>
+                    <th scope="col" className="py-3.5 pl-3 pr-5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60 font-medium">
+                  {paginatedLoans.map((loan) => {
+                    const status = loanStatus(loan)
+                    const remaining = loanRemaining(loan)
+                    const pct = loan.amount > 0 ? (loan.amountRepaid / loan.amount) * 100 : 100
+                    const isBorrowed = loan.direction === "borrowed"
+
+                    return (
+                      <tr
+                        key={loan.id}
+                        className="hover:bg-neutral-50/70 dark:hover:bg-neutral-900/40 transition-colors"
+                      >
+                        {/* Person Name & Status Badges */}
+                        <td className="py-3.5 pl-5 pr-3">
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={cn(
+                                "flex size-9 shrink-0 items-center justify-center rounded-xl text-white shadow-2xs",
+                                isBorrowed ? "bg-red-500" : "bg-emerald-500"
+                              )}
+                            >
+                              <Icon name={isBorrowed ? "arrow-down-left" : "arrow-up-right"} className="size-4.5" />
+                            </span>
+                            <div className="min-w-0">
+                              <p className="font-bold text-neutral-900 dark:text-neutral-100 truncate">{loan.person}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                {status === "overdue" ? (
+                                  <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.2 rounded bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+                                    Overdue
+                                  </span>
+                                ) : null}
+                                {status === "paid" ? (
+                                  <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    Settled
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Direction */}
+                        <td className="px-3 py-3.5 whitespace-nowrap">
+                          <span
+                            className={cn(
+                              "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border",
+                              isBorrowed
+                                ? "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/40"
+                                : "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/40",
+                            )}
+                          >
+                            {isBorrowed ? "Borrowed" : "Lent"}
+                          </span>
+                        </td>
+
+                        {/* Reason */}
+                        <td className="px-3 py-3.5 text-xs text-neutral-600 dark:text-neutral-400 max-w-[200px] truncate">
+                          {loan.reason || "—"}
+                        </td>
+
+                        {/* Progress */}
+                        <td className="px-3 py-3.5">
+                          <div className="max-w-[180px] space-y-1">
+                            <div className="flex items-center justify-between text-[10px]">
+                              <span className="text-neutral-500 font-semibold">{Math.round(pct)}% repaid</span>
+                              {status !== "paid" && (
+                                <span className="text-neutral-400 font-medium">
+                                  {formatMoney(remaining, { symbol: data.settings.currencySymbol })} left
+                                </span>
+                              )}
+                            </div>
+                            <ProgressBar value={pct} tone={status === "paid" ? "success" : status === "overdue" ? "danger" : "accent"} className="h-1.5" />
+                          </div>
+                        </td>
+
+                        {/* Due Date */}
+                        <td className="px-3 py-3.5 whitespace-nowrap text-xs text-neutral-500 dark:text-neutral-400">
+                          {loan.dueDate ? (
+                            <div className="space-y-0.5">
+                              <p className="font-semibold text-neutral-700 dark:text-neutral-300">{relativeDay(loan.dueDate)}</p>
+                              <p className="text-[10px] text-neutral-400">{loan.dueDate}</p>
+                            </div>
+                          ) : (
+                            <span className="text-neutral-400">No due date</span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3.5 pl-3 pr-5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {status !== "paid" && (
+                              <Button
+                                size="xs"
+                                variant="dash"
+                                className="h-8 gap-1 px-2.5 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
+                                onClick={() => handleOpenRepay(loan)}
+                              >
+                                <Icon name="hand-coins" className="size-3" />
+                                Pay
+                              </Button>
+                            )}
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger
+                                render={
+                                  <button
+                                    type="button"
+                                    className="flex size-8 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-black dark:hover:border-neutral-100 transition-all cursor-pointer shadow-2xs"
+                                  >
+                                    <Icon name="ellipsis-vertical" className="size-4" />
+                                  </button>
+                                }
+                              />
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleOpenEdit(loan)}>
+                                  <Icon name="pencil" className="size-4" />
+                                  Edit details
+                                </DropdownMenuItem>
+                                {status !== "paid" ? (
+                                  <DropdownMenuItem onClick={() => handleQuickSettle(loan)}>
+                                    <Icon name="check-check" className="size-4" />
+                                    Mark settled
+                                  </DropdownMenuItem>
+                                ) : null}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem variant="destructive" onClick={() => deleteLoan(loan.id)}>
+                                  <Icon name="trash-2" className="size-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <Pagination

@@ -22,8 +22,8 @@ const buttonVariants = cva(
         destructive: cn('bg-red-500 text-white border border-transparent', buttonHover),
         link: 'border-transparent text-neutral-900 underline-offset-4 hover:text-[#171717] hover:underline normal-case tracking-normal font-medium bg-transparent',
         dash: cn(
-          'bg-neutral-900 text-white border border-transparent font-semibold normal-case tracking-normal',
-          'hover:bg-[#171717] hover:text-white hover:border-[#171717]',
+          'bg-[#FFC700] text-black border border-transparent font-semibold normal-case tracking-normal',
+          buttonHover,
         ),
       },
       size: {
