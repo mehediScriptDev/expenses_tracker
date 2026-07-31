@@ -235,18 +235,18 @@ export default function GoalsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-end justify-between gap-3">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                           Saved
                         </p>
-                        <p className="mt-1 font-mono text-xl font-bold tabular-nums text-(--dash-text)">
+                        <p className="mt-1 font-mono text-xl font-extrabold tabular-nums text-slate-900 dark:text-slate-50">
                           {formatMoney(g.currentAmount, { symbol: data.settings.currencySymbol })}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                           Target
                         </p>
-                        <p className="mt-1 font-mono text-lg font-bold tabular-nums text-[var(--dash-text-secondary)]">
+                        <p className="mt-1 font-mono text-base font-bold tabular-nums text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
                           {formatMoney(g.targetAmount, { symbol: data.settings.currencySymbol })}
                         </p>
                       </div>
@@ -254,12 +254,18 @@ export default function GoalsPage() {
                   </div>
                 </div>
 
-                <ProgressBar value={pct} tone={isCompleted ? "success" : "accent"} className="h-2.5" />
+                <ProgressBar value={pct} tone={isCompleted ? "success" : "accent"} className="h-3" />
 
-                <p className="text-xs text-[var(--dash-text-muted)]">
-                  {isCompleted
-                    ? "Target achieved — great work!"
-                    : `${formatMoney(remaining, { symbol: data.settings.currencySymbol })} remaining`}
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  {isCompleted ? (
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
+                      Target achieved — great work!
+                    </span>
+                  ) : (
+                    <span className="font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
+                      {formatMoney(remaining, { symbol: data.settings.currencySymbol })} remaining
+                    </span>
+                  )}
                 </p>
 
                 <div className="flex gap-2 pt-1">

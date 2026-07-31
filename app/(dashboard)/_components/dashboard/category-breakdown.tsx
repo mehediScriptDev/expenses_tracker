@@ -57,22 +57,30 @@ export function CategoryBreakdown() {
             </div>
           </div>
 
-          <ul className="min-w-0 flex-1 space-y-3.5 sm:space-y-5">
+          <ul className="min-w-0 flex-1 space-y-3.5 sm:space-y-4">
             {rows.map((r) => {
               const pct = Math.round((r.value / total) * 100)
               return (
-                <li key={r.cat!.id} className="space-y-1 sm:space-y-2">
-                  <div className="flex items-center gap-1.5 min-w-0 sm:gap-3">
-                    <Icon name={r.cat!.icon} className="size-3.5 shrink-0 text-[#5C5955] sm:size-4" />
-                    <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[#1A1A1A] sm:text-sm">{r.cat!.name}</span>
-                    <span className="shrink-0 text-[11px] font-medium tabular-nums text-[#5C5955] sm:text-sm">{pct}%</span>
-                    <span className="shrink-0 text-right font-mono text-xs font-bold tabular-nums text-[#1A1A1A] sm:text-sm">
-                      {formatMoney(r.value)}
+                <li key={r.cat!.id} className="space-y-1.5 sm:space-y-2">
+                  <div className="flex items-center gap-2 min-w-0 sm:gap-3">
+                    <span
+                      className="flex size-7 shrink-0 items-center justify-center rounded-lg shadow-2xs"
+                      style={{
+                        backgroundColor: `color-mix(in srgb, ${r.cat!.color} 18%, white)`,
+                        color: r.cat!.color,
+                      }}
+                    >
+                      <Icon name={r.cat!.icon} className="size-3.5 shrink-0" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-900 dark:text-slate-100 sm:text-sm">{r.cat!.name}</span>
+                    <span className="shrink-0 text-xs font-semibold text-slate-500 dark:text-slate-400 tabular-nums">{pct}%</span>
+                    <span className="shrink-0 text-right font-mono text-xs font-bold tabular-nums text-slate-900 dark:text-slate-100 sm:text-sm">
+                      {formatMoney(r.value, { symbol: data.settings.currencySymbol })}
                     </span>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-[#EDE9E1] sm:h-2">
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80 ring-1 ring-black/5">
                     <div
-                      className="h-full rounded-full"
+                      className="h-full rounded-full transition-all duration-500 shadow-2xs"
                       style={{ width: `${pct}%`, backgroundColor: r.cat!.color }}
                     />
                   </div>

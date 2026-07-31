@@ -174,33 +174,33 @@ export default function CategoriesPage() {
             return (
               <article
                 key={cat.id}
-                className="dash-card group relative overflow-hidden transition-shadow hover:shadow-md"
+                className="group relative overflow-hidden rounded-xl bg-white dark:bg-card border border-neutral-200/60 dark:border-neutral-800 shadow-2xs transition-all hover:border-neutral-300 dark:hover:border-neutral-700"
               >
                 <div
-                  className="absolute inset-y-0 left-0 w-1.5"
+                  className="h-1.5 w-full"
                   style={{ backgroundColor: cat.color }}
                   aria-hidden
                 />
 
-                <div className="flex items-start justify-between gap-3 p-4 pl-5 sm:p-5 sm:pl-6">
+                <div className="flex items-start justify-between gap-3 p-4 sm:p-5">
                   <div className="flex min-w-0 flex-1 items-start gap-3">
                     <CategoryBadge icon={cat.icon} color={cat.color} size="md" />
                     <div className="min-w-0 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="truncate text-base font-semibold text-(--dash-text)">{cat.name}</h3>
+                        <h3 className="truncate text-base font-bold text-slate-900 dark:text-slate-50">{cat.name}</h3>
                         {cat.isCustom ? <StatusBadge tone="accent">Custom</StatusBadge> : null}
                         {isBudgeted ? <StatusBadge tone="neutral">Budgeted</StatusBadge> : null}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--dash-text-muted)]">
-                        <span className="inline-flex items-center gap-1">
-                          <Icon name="receipt-text" className="size-3.5" />
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                        <span className="inline-flex items-center gap-1 font-medium bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                          <Icon name="receipt-text" className="size-3.5 text-slate-400" />
                           {stat.count} tx
                         </span>
-                        <span className="font-mono font-semibold text-(--dash-text)">
+                        <span className="font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100/80 dark:bg-slate-800/80 px-2 py-0.5 rounded-md">
                           {formatMoney(stat.total, { symbol: data.settings.currencySymbol })}
                         </span>
-                        <span className="capitalize">{cat.kind}</span>
+                        <span className="capitalize font-semibold text-slate-400">{cat.kind}</span>
                       </div>
                     </div>
                   </div>

@@ -204,27 +204,33 @@ export default function BudgetsPage() {
                   <>
                     <div className="flex items-end justify-between gap-3">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                           Spent
                         </p>
-                        <p className="mt-1 font-mono text-xl font-bold tabular-nums text-(--dash-text)">
+                        <p className="mt-1 font-mono text-xl font-extrabold tabular-nums text-slate-900 dark:text-slate-50">
                           {formatMoney(u.spent, { symbol: data.settings.currencySymbol })}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                           Limit
                         </p>
-                        <p className="mt-1 font-mono text-lg font-bold tabular-nums text-[var(--dash-text-secondary)]">
+                        <p className="mt-1 font-mono text-base font-bold tabular-nums text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
                           {formatMoney(u.budget, { symbol: data.settings.currencySymbol })}
                         </p>
                       </div>
                     </div>
-                    <ProgressBar value={u.pct} tone={tone} className="h-2.5" />
-                    <p className="text-xs text-[var(--dash-text-muted)]">
-                      {u.over
-                        ? `${formatMoney(u.spent - u.budget, { symbol: data.settings.currencySymbol })} above limit`
-                        : `${formatMoney(u.budget - u.spent, { symbol: data.settings.currencySymbol })} left this month`}
+                    <ProgressBar value={u.pct} tone={tone} className="h-3" />
+                    <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                      {u.over ? (
+                        <span className="font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-md">
+                          {formatMoney(u.spent - u.budget, { symbol: data.settings.currencySymbol })} above limit
+                        </span>
+                      ) : (
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
+                          {formatMoney(u.budget - u.spent, { symbol: data.settings.currencySymbol })} left this month
+                        </span>
+                      )}
                     </p>
                   </>
                 )}

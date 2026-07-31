@@ -132,17 +132,17 @@ export function QuickAddBar() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 sm:gap-2.5">
           {presets.map((p) => (
             <button
               key={p.id}
               type="button"
               onClick={() => handleQuickAddPreset(p)}
-              className="inline-flex min-h-10 max-w-full items-center gap-1.5 rounded-xl bg-(--dash-muted) px-2.5 py-2 text-xs font-medium text-(--dash-text) transition-colors hover:bg-(--dash-muted-hover) sm:min-h-11 sm:gap-2 sm:px-3 sm:py-2.5 sm:text-sm"
+              className="inline-flex min-h-10 max-w-full items-center gap-2 rounded-xl bg-slate-100/90 dark:bg-slate-800/90 px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shadow-2xs transition-all hover:bg-amber-50 hover:border-amber-400 hover:text-amber-900 dark:hover:bg-amber-950/40 dark:hover:text-amber-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-11 sm:px-3.5 sm:py-2.5 sm:text-sm cursor-pointer group"
             >
-              <Icon name={p.icon} className="size-3.5 shrink-0 text-(--dash-text-muted) sm:size-4" />
+              <Icon name={p.icon} className="size-4 shrink-0 text-slate-500 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" />
               <span className="truncate max-w-[100px] sm:max-w-none">{p.label}</span>
-              <span className="font-mono text-xs font-semibold text-(--dash-text-muted) sm:text-sm">
+              <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-amber-700 dark:group-hover:text-amber-300 bg-white/70 dark:bg-slate-900/60 px-1.5 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-700/60">
                 {formatMoney(p.amount, { symbol: data.settings.currencySymbol })}
               </span>
             </button>

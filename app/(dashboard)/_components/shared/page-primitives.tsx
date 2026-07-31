@@ -6,11 +6,11 @@ import { formatMoney, formatDate } from "@/lib/format"
 type StatTone = "default" | "success" | "danger" | "accent" | "warning"
 
 const valueTone: Record<StatTone, string> = {
-  default: "text-(--dash-text)",
-  success: "text-(--dash-income)",
-  danger: "text-(--dash-expense)",
-  accent: "text-(--dash-accent)",
-  warning: "text-warning",
+  default: "text-slate-900 dark:text-slate-100",
+  success: "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 ring-1 ring-emerald-200/70 dark:ring-emerald-800/60 px-2 py-0.5 rounded-md",
+  danger: "text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 ring-1 ring-rose-200/70 dark:ring-rose-800/60 px-2 py-0.5 rounded-md",
+  accent: "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 ring-1 ring-blue-200/70 dark:ring-blue-800/60 px-2 py-0.5 rounded-md",
+  warning: "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 ring-1 ring-amber-200/70 dark:ring-amber-800/60 px-2 py-0.5 rounded-md",
 }
 
 export function StatTile({
@@ -29,13 +29,13 @@ export function StatTile({
   className?: string
 }) {
   return (
-    <div className={cn("rounded-xl bg-(--dash-surface) px-3 py-3 ring-1 ring-(--dash-border) sm:px-4 sm:py-3.5", className)}>
-      <div className="flex items-center gap-2 text-(--dash-text-muted)">
-        <Icon name={icon} className="size-3.5 shrink-0" aria-hidden />
-        <p className="text-xs font-medium">{label}</p>
+    <div className={cn("rounded-xl bg-white dark:bg-slate-900 px-3.5 py-3.5 shadow-2xs border border-neutral-200/60 dark:border-neutral-800 sm:px-4 sm:py-4 transition-all", className)}>
+      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+        <Icon name={icon} className="size-4 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden />
+        <p className="text-xs font-semibold uppercase tracking-wider">{label}</p>
       </div>
-      <p className={cn("mt-1.5 font-mono text-lg font-bold tabular-nums sm:text-xl", valueTone[tone])}>{value}</p>
-      {subtext ? <p className="mt-0.5 text-xs text-(--dash-text-faint)">{subtext}</p> : null}
+      <p className={cn("mt-2 font-mono text-lg font-extrabold tabular-nums sm:text-xl", valueTone[tone])}>{value}</p>
+      {subtext ? <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{subtext}</p> : null}
     </div>
   )
 }
@@ -60,14 +60,14 @@ export function SummaryBar({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-(--dash-muted)/70 px-3 py-2.5 text-sm sm:gap-x-5 sm:px-4 sm:py-3",
+        "flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-white dark:bg-card border border-neutral-200/60 dark:border-neutral-800 px-4 py-3 text-sm shadow-2xs sm:gap-x-6 sm:px-5 sm:py-3.5",
         className,
       )}
     >
       {items.map((item) => (
-        <span key={item.label} className="inline-flex items-baseline gap-1.5">
-          <span className="text-(--dash-text-muted)">{item.label}</span>
-          <span className={cn("font-mono font-bold tabular-nums", valueTone[item.tone ?? "default"])}>
+        <span key={item.label} className="inline-flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{item.label}</span>
+          <span className={cn("font-mono font-extrabold tabular-nums text-sm sm:text-base", valueTone[item.tone ?? "default"])}>
             {item.value}
           </span>
         </span>

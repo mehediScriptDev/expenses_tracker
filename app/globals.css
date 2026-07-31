@@ -57,7 +57,7 @@
 
 :root {
   color-scheme: light;
-  /* Exact Warm Organic Cream Background from reference image */
+  /* Original Warm Organic Cream Background & Header/Sidebar */
   --background: #faf8f3;
   --foreground: #1a1a1a;
   --card: #ffffff;
@@ -65,7 +65,7 @@
   --popover: #ffffff;
   --popover-foreground: #1a1a1a;
 
-  /* Reference Signature Canary Yellow Primary Button & Accent */
+  /* Signature Canary Yellow Sidebar/Primary Accent */
   --primary: #ffd000;
   --primary-foreground: #111111;
 
@@ -88,14 +88,14 @@
   --input: rgba(0, 0, 0, 0.12);
   --ring: #ffd000;
 
-  /* Soft Pastel Palette for Category Cards matching reference */
-  --chart-1: #ffd000; /* Sunny Yellow */
-  --chart-2: #f8d7c4; /* Terracotta Peach */
-  --chart-3: #d1f2d9; /* Sage Mint Green */
-  --chart-4: #d4e4ff; /* Periwinkle Blue */
-  --chart-5: #00a86b; /* Deep Mint Emerald */
+  /* Vibrant Category & Component Accent Tokens */
+  --chart-1: #3b82f6; /* Electric Blue */
+  --chart-2: #10b981; /* Emerald Green */
+  --chart-3: #8b5cf6; /* Vivid Purple */
+  --chart-4: #f59e0b; /* Bright Amber */
+  --chart-5: #ec4899; /* Vibrant Pink */
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 
   --sidebar: #faf8f3;
   --sidebar-foreground: #1a1a1a;
@@ -103,27 +103,27 @@
   --sidebar-primary-foreground: #111111;
   --sidebar-accent: #fff4c4;
   --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: rgba(0, 0, 0, 0.1);
+  --sidebar-border: rgba(0, 0, 0, 0.08);
   --sidebar-ring: #ffd000;
 
   --dash-surface: #ffffff;
-  --dash-muted: #e6e0d6;
-  --dash-muted-hover: #d9d2c6;
-  --dash-border: rgba(20, 20, 20, 0.09);
-  --dash-border-strong: rgba(20, 20, 20, 0.16);
-  --dash-text: #141414;
+  --dash-muted: #f5f2eb;
+  --dash-muted-hover: #ebe6dc;
+  --dash-border: rgba(0, 0, 0, 0.08);
+  --dash-border-strong: rgba(0, 0, 0, 0.16);
+  --dash-text: #1a1a1a;
   --dash-text-secondary: #3a3733;
-  --dash-text-muted: #4f4b46;
-  --dash-text-faint: #6f6a63;
-  --dash-accent: #1a4d8f;
-  --dash-accent-soft: #c2daf7;
-  --dash-success-soft: #ccebd6;
-  --dash-danger-soft: #f8d4d4;
-  --dash-expense-soft: #f3e4de;
-  --dash-warning-soft: #fce5c4;
+  --dash-text-muted: #666460;
+  --dash-text-faint: #8c8880;
+  --dash-accent: #2563eb;
+  --dash-accent-soft: #eff6ff;
+  --dash-success-soft: #ecfdf5;
+  --dash-danger-soft: #fef2f2;
+  --dash-expense-soft: #fff1f2;
+  --dash-warning-soft: #fffbeb;
   --dash-progress: #2563eb;
-  --dash-income: #157a42;
-  --dash-expense: #c0392b;
+  --dash-income: #10b981;
+  --dash-expense: #e11d48;
 }
 
 .dark {
@@ -216,23 +216,27 @@
   }
 
   .dash-card {
-    @apply overflow-hidden rounded-xl bg-(--dash-surface) ring-1 ring-(--dash-border);
+    @apply overflow-hidden rounded-xl bg-white dark:bg-card ring-1 ring-neutral-200/60 dark:ring-neutral-800 shadow-2xs transition-shadow duration-200 hover:shadow-xs;
+  }
+
+  .dash-hero {
+    @apply rounded-xl bg-white dark:bg-card p-5 ring-1 ring-neutral-200/60 dark:ring-neutral-800 shadow-2xs sm:p-7;
   }
 
   .dash-muted {
-    @apply rounded-xl bg-(--dash-muted) shadow-none ring-1 ring-(--dash-border);
+    @apply rounded-xl bg-neutral-50 dark:bg-neutral-900/60 ring-1 ring-neutral-200/60 dark:ring-neutral-800 shadow-2xs;
   }
 
   .dash-segment {
-    @apply flex flex-wrap items-center gap-1 rounded-xl bg-(--dash-muted) p-1 ring-1 ring-(--dash-border);
+    @apply flex flex-wrap items-center gap-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 p-1.5 ring-1 ring-neutral-200/60 dark:ring-neutral-700/80;
   }
 
   .dash-segment-item {
-    @apply rounded-lg px-3.5 py-2 text-sm font-medium text-(--dash-text-muted) transition-all;
+    @apply rounded-lg px-3.5 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 transition-all cursor-pointer;
   }
 
   .dash-segment-item-active {
-    @apply bg-(--dash-surface) font-semibold text-(--dash-text) shadow-sm ring-1 ring-(--dash-border-strong);
+    @apply bg-white dark:bg-neutral-900 font-extrabold text-neutral-900 dark:text-neutral-50 shadow-2xs ring-1 ring-neutral-300 dark:ring-neutral-700;
   }
 
   .dash-page {
@@ -240,51 +244,47 @@
   }
 
   .dash-page-header {
-    @apply mb-3 sm:mb-4;
+    @apply mb-4 sm:mb-5;
   }
 
   .dash-page-title {
-    @apply text-2xl font-bold leading-tight tracking-tight text-(--dash-text) sm:text-[1.875rem];
+    @apply text-2xl font-extrabold leading-tight tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-[1.875rem];
   }
 
   .dash-page-desc {
-    @apply mt-1 text-sm leading-relaxed text-(--dash-text-secondary) sm:mt-1.5 sm:text-[15px];
+    @apply mt-1 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400 sm:mt-1.5 sm:text-[15px];
   }
 
   .dash-section-title {
-    @apply text-base font-semibold leading-snug text-(--dash-text);
+    @apply text-base font-bold leading-snug text-neutral-900 dark:text-neutral-50;
   }
 
   .dash-label {
-    @apply text-sm font-semibold leading-none text-(--dash-text-secondary);
+    @apply text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400;
   }
 
   .dash-caption {
-    @apply text-sm leading-relaxed text-(--dash-text-muted);
+    @apply text-sm leading-relaxed text-neutral-500 dark:text-neutral-400;
   }
 
   .dash-meta {
-    @apply text-xs font-bold uppercase tracking-wide text-(--dash-accent);
+    @apply text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400;
   }
 
   .dash-link {
-    @apply text-sm font-semibold text-(--dash-accent) transition-colors hover:text-[#123a6e];
+    @apply text-sm font-bold text-blue-600 dark:text-blue-400 transition-colors hover:text-blue-700 dark:hover:text-blue-300;
   }
 
   .dash-input {
-    @apply h-11 rounded-xl border border-(--dash-border) bg-(--dash-surface) text-sm text-(--dash-text) shadow-sm ring-0 placeholder:text-(--dash-text-faint);
+    @apply h-11 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3.5 text-sm text-neutral-900 dark:text-neutral-100 shadow-2xs ring-0 transition-all focus:border-[#FFC700] focus:ring-2 focus:ring-[#FFC700]/20 placeholder:text-neutral-400;
   }
 
   .dash-stat-value {
-    @apply font-mono text-xl font-bold tabular-nums tracking-tight text-(--dash-text) sm:text-2xl;
+    @apply font-mono text-xl font-extrabold tabular-nums tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-2xl;
   }
 
   .dash-hero-value {
-    @apply font-mono text-3xl font-bold tabular-nums tracking-tight text-(--dash-text) sm:text-[2.75rem] sm:leading-none;
-  }
-
-  .dash-hero {
-    @apply overflow-hidden rounded-xl bg-(--dash-surface) p-4 ring-1 ring-(--dash-border) sm:p-6;
+    @apply font-mono text-3xl font-black tabular-nums tracking-tight text-neutral-900 dark:text-neutral-50 sm:text-4xl lg:text-5xl;
   }
 }
 

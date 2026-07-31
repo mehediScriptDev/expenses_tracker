@@ -60,7 +60,7 @@ function UserMenu() {
       </button>
 
       {open && (
-        <div 
+        <div
           className="absolute right-0 mt-2 w-52 rounded-xl bg-white p-4 z-50 font-mono text-xs text-neutral-800 text-left animate-in fade-in zoom-in-95 duration-100"
           onMouseLeave={() => setOpen(false)}
         >

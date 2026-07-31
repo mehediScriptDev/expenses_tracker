@@ -285,21 +285,23 @@ export default function BorrowedPage() {
 
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Total
                     </p>
-                    <p className="mt-1 font-mono text-2xl font-bold tabular-nums text-[var(--dash-text)]">
+                    <p className="mt-1 font-mono text-2xl font-extrabold tabular-nums text-slate-900 dark:text-slate-50">
                       {formatMoney(loan.amount, { symbol: data.settings.currencySymbol })}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--dash-text-muted)]">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       {status === "paid" ? "Status" : "Remaining"}
                     </p>
                     <p
                       className={cn(
-                        "mt-1 font-mono text-lg font-bold tabular-nums",
-                        status === "paid" ? "text-success" : "text-[var(--dash-text)]",
+                        "mt-1 font-mono text-base font-bold tabular-nums px-2.5 py-1 rounded-lg",
+                        status === "paid"
+                          ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60"
+                          : "text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800",
                       )}
                     >
                       {status === "paid"
@@ -312,7 +314,7 @@ export default function BorrowedPage() {
                 <ProgressBar
                   value={pct}
                   tone={status === "paid" ? "success" : status === "overdue" ? "danger" : "accent"}
-                  className="h-2.5"
+                  className="h-3"
                 />
 
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--dash-text-muted)]">

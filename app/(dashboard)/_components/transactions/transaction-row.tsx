@@ -39,37 +39,39 @@ export function TransactionRow({
   ].filter(Boolean)
 
   return (
-    <article className="group flex items-center gap-3 rounded-xl bg-(--dash-surface) px-3 py-3 ring-1 ring-(--dash-border) sm:px-4">
+    <article className="group flex items-center gap-3.5 rounded-xl bg-white dark:bg-card px-3.5 py-3.5 shadow-2xs border border-neutral-200/60 dark:border-neutral-800 transition-all hover:bg-neutral-50/50">
       <span
-        className="flex size-9 shrink-0 items-center justify-center rounded-lg sm:size-10"
+        className="flex size-10 shrink-0 items-center justify-center rounded-xl shadow-2xs"
         style={{
-          backgroundColor: `color-mix(in oklch, ${accent} 28%, white)`,
+          backgroundColor: `color-mix(in srgb, ${accent} 18%, white)`,
           color: accent,
         }}
       >
-        <Icon name={cat?.icon ?? "circle"} className="size-4" />
+        <Icon name={cat?.icon ?? "circle"} className="size-4.5" />
       </span>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-(--dash-text)">
+            <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
               {tx.description || cat?.name || "Transaction"}
               {tx.recurring ? (
-                <Icon name="repeat" className="ml-1.5 inline size-3 text-(--dash-text-faint)" aria-hidden />
+                <Icon name="repeat" className="ml-1.5 inline size-3 text-slate-400" aria-hidden />
               ) : null}
             </p>
             {tx.merchant ? (
-              <p className="truncate text-xs text-(--dash-text-muted)">{tx.merchant}</p>
+              <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">{tx.merchant}</p>
             ) : meta.length > 0 ? (
-              <p className="truncate text-xs text-(--dash-text-muted)">{meta.join(" · ")}</p>
+              <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">{meta.join(" · ")}</p>
             ) : null}
           </div>
 
           <span
             className={cn(
-              "shrink-0 font-mono text-sm font-bold tabular-nums",
-              isIncome ? "text-(--dash-income)" : "text-(--dash-expense)",
+              "shrink-0 font-mono text-sm font-bold tabular-nums px-2 py-0.5 rounded-lg",
+              isIncome
+                ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 ring-1 ring-emerald-200/70 dark:ring-emerald-800/60"
+                : "text-rose-600 dark:text-rose-400 font-extrabold",
             )}
           >
             {isIncome ? formatMoney(tx.amount, { sign: true }) : `-${formatMoney(tx.amount)}`}
