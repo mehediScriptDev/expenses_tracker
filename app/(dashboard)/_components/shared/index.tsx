@@ -29,6 +29,8 @@ export {
   PageHero,
 } from "./page-primitives"
 
+export { Pagination } from "@/components/ui/pagination"
+
 /* ------------------------- ProgressBar ------------------------- */
 
 export type Tone = "primary" | "accent" | "success" | "warning" | "danger" | "muted"

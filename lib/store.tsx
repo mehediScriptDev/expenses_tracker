@@ -62,7 +62,7 @@ interface StoreValue {
   undoDelete: () => void
   canUndo: boolean
   // categories
-  addCategory: (cat: Omit<Category, "id" | "isCustom">) => void
+  addCategory: (cat: Omit<Category, "id" | "isCustom">) => Category
   updateCategory: (id: string, patch: Partial<Category>) => void
   deleteCategory: (id: string) => void
   // loans
@@ -158,14 +158,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         lastDeleted.current = null
         setCanUndo(false)
       },
-      addCategory: (cat) =>
+      addCategory: (cat) => {
+        const full: Category = { ...cat, id: uid("cat"), isCustom: true }
         setData((d) => ({
           ...d,
-          categories: [
-            ...d.categories,
-            { ...cat, id: uid("cat"), isCustom: true },
-          ],
-        })),
+          categories: [...d.categories, full],
+        }))
+        return full
+      },
       updateCategory: (id, patch) =>
         setData((d) => ({
           ...d,

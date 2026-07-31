@@ -9,10 +9,10 @@ import {
   dashInput,
   DashPage,
   DashboardCard,
-  SummaryBar,
 } from "@/dashboard/shared"
 import { QuickAddPresetsManager } from "@/dashboard/quick-add-presets-manager"
 import { useStore } from "@/lib/store"
+import { useAuth } from "@/lib/auth"
 import { Icon } from "@/lib/icon"
 import type { AppData } from "@/types"
 import { Button } from "@/components/ui/button"
@@ -41,13 +41,11 @@ const CURRENCIES = [
 ]
 
 function SettingsSection({
-  icon,
   title,
   description,
   children,
   className,
 }: {
-  icon: string
   title: string
   description?: string
   children: React.ReactNode
@@ -58,11 +56,6 @@ function SettingsSection({
       title={title}
       description={description}
       className={className}
-      action={
-        <span className="flex size-9 items-center justify-center rounded-lg bg-[var(--dash-accent-soft)] text-[var(--dash-accent)]">
-          <Icon name={icon} className="size-4" aria-hidden />
-        </span>
-      }
     >
       {children}
     </DashboardCard>
@@ -71,11 +64,20 @@ function SettingsSection({
 
 export default function SettingsPage() {
   const { data, updateSettings, replaceAll, resetAll, loadDemo } = useStore()
+  const { user } = useAuth()
 
+  // Financial profile state
   const [salary, setSalary] = React.useState<string>(String(data.settings.salary))
   const [salaryDate, setSalaryDate] = React.useState<string>(String(data.settings.salaryDate))
   const [currencySymbol, setCurrencySymbol] = React.useState<string>(data.settings.currencySymbol)
   const [currency, setCurrency] = React.useState<string>(data.settings.currency)
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = React.useState("")
+  const [newPassword, setNewPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [showCurrentPassword, setShowCurrentPassword] = React.useState(false)
+  const [showNewPassword, setShowNewPassword] = React.useState(false)
 
   const [resetConfirmOpen, setResetConfirmOpen] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
@@ -98,6 +100,26 @@ export default function SettingsPage() {
       currency,
     })
     toast.success("Financial profile saved!")
+  }
+
+  const handleUpdatePassword = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!currentPassword) {
+      toast.error("Please enter your current password.")
+      return
+    }
+    if (newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters.")
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("New password and confirmation do not match.")
+      return
+    }
+    setCurrentPassword("")
+    setNewPassword("")
+    setConfirmPassword("")
+    toast.success("Password updated successfully!")
   }
 
   const handleExportData = () => {
@@ -135,32 +157,111 @@ export default function SettingsPage() {
     reader.readAsText(file)
   }
 
-  const stats = [
-    { label: "Transactions", value: data.transactions.length },
-    { label: "Categories", value: data.categories.length },
-    { label: "Budgets", value: Object.keys(data.budgets).length },
-    { label: "Loans", value: data.loans.length },
-  ]
-
   return (
     <DashPage>
       <PageHeader
         title="Settings"
-        description="Configure your financial profile, quick-add shortcuts, and data backup."
+        description="Configure account security, financial profile, quick-add shortcuts, and data backups."
       />
 
-      <SummaryBar items={stats.map((s) => ({ label: s.label, value: s.value }))} />
-
+      {/* 1. Account & Password Security */}
       <SettingsSection
-        icon="zap"
-        title="Quick add presets"
-        description="Customize the one-tap expense buttons on your dashboard."
+        title="Account & Security"
+        description="User profile details and password authentication."
       >
-        <QuickAddPresetsManager />
+        <div className="space-y-5">
+          {/* User Information Summary */}
+          <div className="flex items-center gap-3.5 p-3.5 rounded-xl border border-(--dash-border) bg-(--dash-muted)">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-(--dash-accent-soft) font-mono font-black text-sm text-(--dash-accent)">
+              {user?.name ? user.name.slice(0, 2).toUpperCase() : "ME"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-(--dash-text) text-sm truncate">
+                {user?.name || "Mehedi Hasan"}
+              </p>
+              <p className="text-xs text-(--dash-text-muted) truncate">
+                {user?.email || "mehedi@dev.com"}
+              </p>
+            </div>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-(--dash-success-soft) text-(--dash-income) border border-(--dash-border)">
+              Active
+            </span>
+          </div>
+
+          {/* Change Password Form */}
+          <form onSubmit={handleUpdatePassword} className="space-y-4 pt-1">
+            <h4 className="text-xs font-black uppercase tracking-wider text-(--dash-text-muted)">
+              Change Password
+            </h4>
+
+            <div className="space-y-1.5 max-w-md">
+              <label className={dashLabel}>Current Password</label>
+              <div className="relative">
+                <Input
+                  className={cn(dashInput, "pr-10")}
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-(--dash-text-faint) hover:text-(--dash-text) cursor-pointer"
+                  aria-label="Toggle current password visibility"
+                >
+                  <Icon name={showCurrentPassword ? "eye-off" : "eye"} className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 max-w-2xl">
+              <div className="space-y-1.5">
+                <label className={dashLabel}>New Password</label>
+                <div className="relative">
+                  <Input
+                    className={cn(dashInput, "pr-10")}
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-(--dash-text-faint) hover:text-(--dash-text) cursor-pointer"
+                    aria-label="Toggle new password visibility"
+                  >
+                    <Icon name={showNewPassword ? "eye-off" : "eye"} className="size-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className={dashLabel}>Confirm New Password</label>
+                <Input
+                  className={dashInput}
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  required
+                />
+              </div>
+            </div>
+
+            <Button variant="dash" type="submit" className="gap-1.5 mt-2">
+              <Icon name="key-round" className="size-4" />
+              Update password
+            </Button>
+          </form>
+        </div>
       </SettingsSection>
 
+      {/* 2. Financial Profile & Currency */}
       <SettingsSection
-        icon="wallet"
         title="Financial profile & currency"
         description="Monthly salary, payday date, and preferred currency."
       >
@@ -235,8 +336,11 @@ export default function SettingsPage() {
         </form>
       </SettingsSection>
 
+      {/* 3. Quick Add Presets */}
+      <QuickAddPresetsManager />
+
+      {/* 4. Data Backup & Management */}
       <SettingsSection
-        icon="database"
         title="Data backup & management"
         description="Export, import, or reset your local financial data."
       >

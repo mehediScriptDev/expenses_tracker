@@ -15,6 +15,7 @@ import {
   PageHero,
   StatusBadge,
   DashboardCard,
+  Pagination,
 } from "@/dashboard/shared"
 import { useStore } from "@/lib/store"
 import { loanTotals, loanStatus, loanRemaining } from "@/lib/selectors"
@@ -48,6 +49,9 @@ export default function BorrowedPage() {
   const [statusFilter, setStatusFilter] = React.useState<"all" | "unpaid" | "overdue" | "paid">("all")
   const [search, setSearch] = React.useState("")
 
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(6)
+
   const [loanModalOpen, setLoanModalOpen] = React.useState(false)
   const [editingLoan, setEditingLoan] = React.useState<Loan | null>(null)
 
@@ -57,6 +61,10 @@ export default function BorrowedPage() {
 
   const totals = React.useMemo(() => loanTotals(data.loans), [data.loans])
   const netPosition = totals.lentOutstanding - totals.borrowedOutstanding
+
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [search, directionTab, statusFilter])
 
   const filteredLoans = React.useMemo(() => {
     return data.loans
@@ -79,6 +87,13 @@ export default function BorrowedPage() {
       })
       .sort((a, b) => b.createdAt - a.createdAt)
   }, [data.loans, directionTab, statusFilter, search])
+
+  const totalPages = Math.ceil(filteredLoans.length / pageSize) || 1
+
+  const paginatedLoans = React.useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredLoans.slice(start, start + pageSize)
+  }, [filteredLoans, currentPage, pageSize])
 
   const handleOpenAdd = () => {
     setEditingLoan(null)
@@ -111,63 +126,99 @@ export default function BorrowedPage() {
     updateLoan(loan.id, { amountRepaid: loan.amount })
   }
 
+  const stats = [
+    {
+      label: "I Owe",
+      value: formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol }),
+      icon: "arrow-down-left",
+      cardBg: "bg-[#FEE2E2] dark:bg-[#451212]",
+      textColor: "text-[#991B1B] dark:text-[#FCA5A5]",
+      iconBg: "bg-[#FCA5A5] text-[#7F1D1D] dark:bg-[#7F1D1D] dark:text-[#FCA5A5]",
+      labelColor: "text-[#B91C1C] dark:text-[#FCA5A5]",
+    },
+    {
+      label: "Owed to Me",
+      value: formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol }),
+      icon: "arrow-up-right",
+      cardBg: "bg-[#EBF7EE] dark:bg-[#0B2E17]",
+      textColor: "text-[#134D25] dark:text-[#C1F0CC]",
+      iconBg: "bg-[#C4EAD0] text-[#0C3B1B] dark:bg-[#194D27] dark:text-[#C1F0CC]",
+      labelColor: "text-[#196631] dark:text-[#9EE5AF]",
+    },
+    {
+      label: "Overdue Records",
+      value: totals.overdue.length,
+      icon: "clock-alert",
+      cardBg: "bg-[#FDF0E9] dark:bg-[#381B0E]",
+      textColor: "text-[#6E2E10] dark:text-[#FCD5C5]",
+      iconBg: "bg-[#FCD8C5] text-[#52200A] dark:bg-[#5C2A15] dark:text-[#FCD5C5]",
+      labelColor: "text-[#8C3D18] dark:text-[#FBBFA8]",
+    },
+    {
+      label: "Total Records",
+      value: data.loans.length,
+      icon: "hand-coins",
+      cardBg: "bg-[#EEF4FF] dark:bg-[#102347]",
+      textColor: "text-[#163870] dark:text-[#C7DBFF]",
+      iconBg: "bg-[#CFE1FF] text-[#0E2854] dark:bg-[#1E3B6E] dark:text-[#C7DBFF]",
+      labelColor: "text-[#1E4A94] dark:text-[#A8C7FF]",
+    },
+  ]
+
   return (
     <DashPage>
       <PageHeader
         title="Borrowed & lent"
         description="Track money you owe and money others owe you, with due dates and repayment progress."
-      >
-        <Button variant="dash" onClick={handleOpenAdd} className="h-11 w-full gap-1.5 px-5 sm:w-auto">
-          <Icon name="plus" className="size-4" />
-          Add record
-        </Button>
-      </PageHeader>
-
-      <PageHero
-        label="Net position"
-        value={formatMoney(netPosition, { symbol: data.settings.currencySymbol, sign: true })}
-        caption={
-          <>
-            You owe{" "}
-            <strong className="font-semibold text-destructive">
-              {formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol })}
-            </strong>{" "}
-            · Others owe you{" "}
-            <strong className="font-semibold text-success">
-              {formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol })}
-            </strong>
-          </>
-        }
-      >
-        <div className="max-w-xl space-y-2">
-          <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="font-medium text-(--dash-text-secondary)">Overall repayment progress</span>
-            <span className="font-semibold tabular-nums">{Math.round(totals.repaymentPct)}%</span>
-          </div>
-          <ProgressBar value={totals.repaymentPct} tone="accent" className="h-2.5" />
-        </div>
-      </PageHero>
-
-      <SummaryBar
-        items={[
-          {
-            label: "I owe",
-            value: formatMoney(totals.borrowedOutstanding, { symbol: data.settings.currencySymbol }),
-            tone: "danger",
-          },
-          {
-            label: "Owed to me",
-            value: formatMoney(totals.lentOutstanding, { symbol: data.settings.currencySymbol }),
-            tone: "success",
-          },
-          {
-            label: "Overdue",
-            value: totals.overdue.length,
-            tone: totals.overdue.length > 0 ? "danger" : "default",
-          },
-          { label: "Records", value: data.loans.length },
-        ]}
       />
+
+      <section className="rounded-xl bg-white dark:bg-card p-5 sm:p-7 border border-neutral-200/60 dark:border-neutral-800 shadow-2xs space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 flex-1 space-y-2 max-w-xl">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                Overall repayment progress
+              </span>
+              <span className="text-sm font-extrabold tabular-nums text-neutral-900 dark:text-neutral-100">
+                {Math.round(totals.repaymentPct)}%
+              </span>
+            </div>
+            <ProgressBar value={totals.repaymentPct} tone="accent" className="h-3" />
+          </div>
+
+          <Button
+            onClick={handleOpenAdd}
+            className="h-10 px-5 gap-1.5 shadow-2xs shrink-0 font-semibold"
+          >
+            <Icon name="plus" className="size-4" />
+            Add record
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-2 min-w-0 sm:gap-4 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className={cn(
+                "min-w-0 overflow-hidden rounded-xl p-3.5 sm:p-4.5 transition-transform hover:-translate-y-0.5 border border-black/5 dark:border-white/5 shadow-2xs",
+                stat.cardBg,
+              )}
+            >
+              <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+                <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-xl sm:size-9", stat.iconBg)}>
+                  <Icon name={stat.icon} className="size-4 sm:size-4.5" aria-hidden />
+                </span>
+                <p className={cn("min-w-0 flex-1 truncate text-xs font-black uppercase tracking-wider", stat.labelColor)}>
+                  {stat.label}
+                </p>
+              </div>
+              <p className={cn("mt-2.5 truncate font-mono text-xl font-black tabular-nums tracking-tight sm:mt-3 sm:text-2xl", stat.textColor)}>
+                {stat.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <FilterToolbar>
         <div className={cn(dashSegment, "w-full bg-[var(--dash-surface)] lg:w-auto")}>
@@ -196,14 +247,14 @@ export default function BorrowedPage() {
               placeholder="Search person or reason..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={cn(dashInput, "border-0 bg-[var(--dash-surface)] pl-10 shadow-none")}
+              className={cn(dashInput, "h-11 border-0 bg-[var(--dash-surface)] pl-10 shadow-none")}
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-            className="dash-input w-full px-3 text-sm sm:w-auto"
+            className="dash-input h-11 w-full px-3.5 text-sm sm:w-auto rounded-xl"
           >
             <option value="all">All statuses</option>
             <option value="unpaid">Outstanding</option>
@@ -222,131 +273,151 @@ export default function BorrowedPage() {
               ? "Start tracking borrowed or lent money with due dates and repayment history."
               : "No records match your current filters."
           }
-          action={<Button variant="dash" onClick={handleOpenAdd}>Add record</Button>}
+          action={<Button onClick={handleOpenAdd}>Add record</Button>}
         />
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {filteredLoans.map((loan) => {
-            const status = loanStatus(loan)
-            const remaining = loanRemaining(loan)
-            const pct = loan.amount > 0 ? (loan.amountRepaid / loan.amount) * 100 : 100
-            const isBorrowed = loan.direction === "borrowed"
+        <div className="space-y-6">
+          <div className="grid gap-4 lg:grid-cols-2">
+            {paginatedLoans.map((loan) => {
+              const status = loanStatus(loan)
+              const remaining = loanRemaining(loan)
+              const pct = loan.amount > 0 ? (loan.amountRepaid / loan.amount) * 100 : 100
+              const isBorrowed = loan.direction === "borrowed"
 
-            return (
-              <DashboardCard
-                key={loan.id}
-                title={loan.person}
-                description={loan.reason || "No reason provided"}
-                action={
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button variant="ghost" size="icon" className="size-8 text-[var(--dash-text-muted)]">
-                          <Icon name="ellipsis-vertical" className="size-4" />
-                        </Button>
-                      }
-                    />
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleOpenEdit(loan)}>
-                        <Icon name="pencil" className="size-4" />
-                        Edit details
-                      </DropdownMenuItem>
-                      {status !== "paid" ? (
-                        <DropdownMenuItem onClick={() => handleQuickSettle(loan)}>
-                          <Icon name="check-check" className="size-4" />
-                          Mark settled
+              return (
+                <DashboardCard
+                  key={loan.id}
+                  title={loan.person}
+                  description={loan.reason || "No reason provided"}
+                  action={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <button
+                            type="button"
+                            className="flex size-8 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-black dark:hover:border-neutral-100 transition-all cursor-pointer"
+                          >
+                            <Icon name="ellipsis-vertical" className="size-4" />
+                          </button>
+                        }
+                      />
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleOpenEdit(loan)}>
+                          <Icon name="pencil" className="size-4" />
+                          Edit details
                         </DropdownMenuItem>
-                      ) : null}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem variant="destructive" onClick={() => deleteLoan(loan.id)}>
-                        <Icon name="trash-2" className="size-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                }
-                bodyClassName="space-y-4"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusBadge tone={isBorrowed ? "danger" : "success"} icon={isBorrowed ? "arrow-down-left" : "arrow-up-right"}>
-                    {isBorrowed ? "Borrowed" : "Lent"}
-                  </StatusBadge>
-                  {status === "overdue" ? (
-                    <StatusBadge tone="danger" icon="clock-alert">
-                      Overdue
+                        {status !== "paid" ? (
+                          <DropdownMenuItem onClick={() => handleQuickSettle(loan)}>
+                            <Icon name="check-check" className="size-4" />
+                            Mark settled
+                          </DropdownMenuItem>
+                        ) : null}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem variant="destructive" onClick={() => deleteLoan(loan.id)}>
+                          <Icon name="trash-2" className="size-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  }
+                  bodyClassName="space-y-4"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge tone={isBorrowed ? "danger" : "success"} icon={isBorrowed ? "arrow-down-left" : "arrow-up-right"}>
+                      {isBorrowed ? "Borrowed" : "Lent"}
                     </StatusBadge>
+                    {status === "overdue" ? (
+                      <StatusBadge tone="danger" icon="clock-alert">
+                        Overdue
+                      </StatusBadge>
+                    ) : null}
+                    {status === "paid" ? (
+                      <StatusBadge tone="success" icon="circle-check">
+                        Settled
+                      </StatusBadge>
+                    ) : null}
+                  </div>
+
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Total
+                      </p>
+                      <p className="mt-1 font-mono text-2xl font-black tabular-nums text-slate-900 dark:text-slate-50">
+                        {formatMoney(loan.amount, { symbol: data.settings.currencySymbol })}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        {status === "paid" ? "Status" : "Remaining"}
+                      </p>
+                      <p
+                        className={cn(
+                          "mt-1 font-mono text-base font-bold tabular-nums px-2.5 py-1 rounded-lg",
+                          status === "paid"
+                            ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60"
+                            : "text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800/80",
+                        )}
+                      >
+                        {status === "paid"
+                          ? "Paid in full"
+                          : formatMoney(remaining, { symbol: data.settings.currencySymbol })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <ProgressBar
+                    value={pct}
+                    tone={status === "paid" ? "success" : status === "overdue" ? "danger" : "accent"}
+                    className="h-3"
+                  />
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--dash-text-muted)] font-medium">
+                    <span>Started {loan.date}</span>
+                    {loan.dueDate ? (
+                      <span className={status === "overdue" ? "font-bold text-rose-600 dark:text-rose-400" : ""}>
+                        Due {relativeDay(loan.dueDate)} ({loan.dueDate})
+                      </span>
+                    ) : (
+                      <span>No due date</span>
+                    )}
+                  </div>
+
+                  {status !== "paid" ? (
+                    <div className="flex gap-2 pt-1">
+                      <Button
+                        size="sm"
+                        variant="dash"
+                        className="h-11 flex-1 gap-1.5 text-xs font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
+                        onClick={() => handleOpenRepay(loan)}
+                      >
+                        <Icon name="hand-coins" className="size-3.5" />
+                        Record payment
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-11 px-5 text-xs font-bold"
+                        onClick={() => handleQuickSettle(loan)}
+                      >
+                        Settle
+                      </Button>
+                    </div>
                   ) : null}
-                  {status === "paid" ? (
-                    <StatusBadge tone="success" icon="circle-check">
-                      Settled
-                    </StatusBadge>
-                  ) : null}
-                </div>
+                </DashboardCard>
+              )
+            })}
+          </div>
 
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                      Total
-                    </p>
-                    <p className="mt-1 font-mono text-2xl font-extrabold tabular-nums text-slate-900 dark:text-slate-50">
-                      {formatMoney(loan.amount, { symbol: data.settings.currencySymbol })}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                      {status === "paid" ? "Status" : "Remaining"}
-                    </p>
-                    <p
-                      className={cn(
-                        "mt-1 font-mono text-base font-bold tabular-nums px-2.5 py-1 rounded-lg",
-                        status === "paid"
-                          ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60"
-                          : "text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800",
-                      )}
-                    >
-                      {status === "paid"
-                        ? "Paid in full"
-                        : formatMoney(remaining, { symbol: data.settings.currencySymbol })}
-                    </p>
-                  </div>
-                </div>
-
-                <ProgressBar
-                  value={pct}
-                  tone={status === "paid" ? "success" : status === "overdue" ? "danger" : "accent"}
-                  className="h-3"
-                />
-
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--dash-text-muted)]">
-                  <span>Started {loan.date}</span>
-                  {loan.dueDate ? (
-                    <span className={status === "overdue" ? "font-semibold text-destructive" : ""}>
-                      Due {relativeDay(loan.dueDate)} ({loan.dueDate})
-                    </span>
-                  ) : (
-                    <span>No due date</span>
-                  )}
-                </div>
-
-                {status !== "paid" ? (
-                  <div className="flex gap-2 pt-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-9 flex-1 gap-1.5 text-xs"
-                      onClick={() => handleOpenRepay(loan)}
-                    >
-                      <Icon name="hand-coins" className="size-3.5" />
-                      Record payment
-                    </Button>
-                    <Button variant="dash" size="sm" className="h-9 text-xs" onClick={() => handleQuickSettle(loan)}>
-                      Settle
-                    </Button>
-                  </div>
-                ) : null}
-              </DashboardCard>
-            )
-          })}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={filteredLoans.length}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[6, 12, 24, 48]}
+          />
         </div>
       )}
 
