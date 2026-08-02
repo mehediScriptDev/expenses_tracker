@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import type { Transaction } from "@/types"
 import { MAIN_NAV, MOBILE_NAV } from "@/config/navigation"
 import { MobileSidebar } from "@/dashboard/layout/mobile-sidebar"
+import { BrandSpinner } from "@/app/loading"
 
 interface UIContextValue {
   openAdd: () => void
@@ -268,14 +269,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function LoadingScreen() {
   return (
-    <div className="grid gap-4">
-      <div className="h-8 w-48 animate-pulse rounded-lg bg-neutral-200 dark:bg-muted" />
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-28 animate-pulse rounded-xl bg-neutral-200 dark:bg-muted" />
-        ))}
-      </div>
-      <div className="h-64 animate-pulse rounded-xl bg-muted" />
+    <div className="flex h-[60vh] w-full items-center justify-center">
+      <BrandSpinner />
     </div>
   )
 }

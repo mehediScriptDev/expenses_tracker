@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
+import { BrandSpinner } from "@/app/loading"
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -16,8 +17,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (!hydrated || !isAuthenticated) {
     return (
-      <div className="min-h-svh bg-background flex items-center justify-center">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-neutral-200" />
+      <div className="min-h-svh bg-[#FAF8F3] dark:bg-background flex items-center justify-center">
+        <BrandSpinner />
       </div>
     )
   }
