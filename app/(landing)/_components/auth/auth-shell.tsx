@@ -10,10 +10,11 @@ import { LegalDialog } from "../legal-dialog"
 interface AuthShellProps {
   progress?: number
   children: React.ReactNode
-  footer: React.ReactNode
+  footer?: React.ReactNode
+  onBack?: () => void
 }
 
-export function AuthShell({ progress = 50, children, footer }: AuthShellProps) {
+export function AuthShell({ progress = 50, children, footer, onBack }: AuthShellProps) {
   return (
     <div className="min-h-screen bg-[#FAF8F3] flex flex-col items-center px-4 py-8 sm:py-10">
       <Link href="/" className="mb-8 lg:mb-10">
@@ -28,13 +29,24 @@ export function AuthShell({ progress = 50, children, footer }: AuthShellProps) {
       </Link>
 
       <div className="w-full max-w-md flex items-center gap-3 mb-8 px-1">
-        <Link
-          href="/"
-          aria-label="Go back"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-200/60 transition-colors"
-        >
-          <Icon name="arrow-left" className="size-5" />
-        </Link>
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="Go back"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-200/60 transition-colors cursor-pointer"
+          >
+            <Icon name="arrow-left" className="size-5" />
+          </button>
+        ) : (
+          <Link
+            href="/"
+            aria-label="Go back"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full text-neutral-900 hover:bg-neutral-200/60 transition-colors"
+          >
+            <Icon name="arrow-left" className="size-5" />
+          </Link>
+        )}
         <div className="h-1.5 flex-1 rounded-full bg-neutral-200 overflow-hidden">
           <div
             className="h-full bg-[#FFC700] rounded-full transition-all duration-300"
@@ -43,11 +55,13 @@ export function AuthShell({ progress = 50, children, footer }: AuthShellProps) {
         </div>
       </div>
 
-      <div className="w-full max-w-md rounded-2xl border border-neutral-200/80 bg-white overflow-hidden">
+      <div className="w-full max-w-md rounded-lg border border-neutral-200/80 bg-white overflow-hidden">
         <div className="px-6 py-8 sm:px-8 sm:py-10">{children}</div>
-        <div className="border-t border-neutral-200 bg-[#FAFAF8] px-6 py-4 text-center text-sm text-neutral-700">
-          {footer}
-        </div>
+        {footer ? (
+          <div className="border-t border-neutral-200 bg-[#FAFAF8] px-6 py-4 text-center text-sm text-neutral-700">
+            {footer}
+          </div>
+        ) : null}
       </div>
     </div>
   )
@@ -71,7 +85,7 @@ export function AuthField({
       <input
         {...props}
         placeholder={props.placeholder ?? label}
-        className="w-full rounded-xl border border-neutral-200 bg-[#F3F3F3] px-4 py-3.5 text-sm text-neutral-900 placeholder:text-neutral-500 outline-none transition-colors focus:border-neutral-400 focus:bg-white"
+        className="w-full rounded-md border border-neutral-200 bg-[#F3F3F3] px-4 py-3.5 text-sm text-neutral-900 placeholder:text-neutral-500 outline-none focus:outline-none focus:ring-0 focus:border-[#FFC700] transition-colors"
       />
     </label>
   )
@@ -79,30 +93,37 @@ export function AuthField({
 
 export function AuthPasswordField({
   label,
+  forgotPassword,
   ...props
-}: Omit<React.ComponentProps<"input">, "type"> & { label: string }) {
+}: Omit<React.ComponentProps<"input">, "type"> & {
+  label: string
+  forgotPassword?: React.ReactNode
+}) {
   const [visible, setVisible] = React.useState(false)
 
   return (
-    <label className="block space-y-2">
-      <span className="sr-only">{label}</span>
-      <div className="relative">
-        <input
-          {...props}
-          type={visible ? "text" : "password"}
-          placeholder={props.placeholder ?? label}
-          className="w-full rounded-xl border border-neutral-200 bg-[#F3F3F3] px-4 py-3.5 pr-11 text-sm text-neutral-900 placeholder:text-neutral-500 outline-none transition-colors focus:border-neutral-400 focus:bg-white"
-        />
-        <button
-          type="button"
-          onClick={() => setVisible((current) => !current)}
-          aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer"
-        >
-          <Icon name={visible ? "eye-off" : "eye"} className="size-4.5" />
-        </button>
-      </div>
-    </label>
+    <div className="space-y-1.5">
+      <label className="block space-y-2">
+        <span className="sr-only">{label}</span>
+        <div className="relative">
+          <input
+            {...props}
+            type={visible ? "text" : "password"}
+            placeholder={props.placeholder ?? label}
+            className="w-full rounded-md border border-neutral-200 bg-[#F3F3F3] px-4 py-3.5 pr-11 text-sm text-neutral-900 placeholder:text-neutral-500 outline-none focus:outline-none focus:ring-0 focus:border-[#FFC700] transition-colors"
+          />
+          <button
+            type="button"
+            onClick={() => setVisible((current) => !current)}
+            aria-label={visible ? "Hide password" : "Show password"}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer"
+          >
+            <Icon name={visible ? "eye-off" : "eye"} className="size-4.5" />
+          </button>
+        </div>
+      </label>
+      {forgotPassword && <div className="flex justify-end">{forgotPassword}</div>}
+    </div>
   )
 }
 
@@ -121,7 +142,7 @@ export function GoogleAuthButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3.5 text-sm font-semibold text-neutral-800 transition-colors hover:bg-neutral-50 cursor-pointer"
+      className="flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3.5 text-sm font-semibold text-neutral-800 transition-colors hover:bg-neutral-50 cursor-pointer"
     >
       <svg viewBox="0 0 24 24" className="size-5 shrink-0" aria-hidden="true">
         <path

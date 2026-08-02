@@ -14,17 +14,17 @@ export function LandingFooter() {
     <>
       <footer className="section-padding w-full container border-t border-neutral-200/60 text-left space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <Link href="/">
+          <div className="flex flex-col gap-3.5">
+            <Link href="/" className="inline-block">
               <Image
                 src="/logo.png"
                 alt="Gorib Manush Logo"
-                width={180}
-                height={45}
-                className="h-10 w-auto object-contain"
+                width={240}
+                height={64}
+                className="h-14 w-auto object-contain object-left lg:h-16"
               />
             </Link>
-            <p className="text-xs text-neutral-500 max-w-sm leading-relaxed">
+            <p className="text-xs sm:text-sm text-neutral-700 max-w-sm leading-relaxed font-medium">
               Gorib Manush helps you take complete control of your finances with daily spending limits,
               budget tracking, and savings goals.
             </p>

@@ -8,22 +8,24 @@ function id(prefix = "t") {
   return `${prefix}_${Date.now().toString(36)}_${counter}`
 }
 
-function makeTx(
-  daysAgo: number,
+function makeDate(year: number, month: number, day: number): Date {
+  return new Date(year, month, day)
+}
+
+function makeTxOnDate(
+  date: Date,
   amount: number,
   categoryId: string,
   description: string,
   extra: Partial<Transaction> = {},
 ): Transaction {
-  const d = new Date()
-  d.setDate(d.getDate() - daysAgo)
   return {
     id: id(),
     type: extra.type ?? "expense",
     amount,
     categoryId,
     description,
-    date: toISODate(d),
+    date: toISODate(date),
     time: extra.time ?? "13:30",
     paymentMethod: extra.paymentMethod ?? "cash",
     merchant: extra.merchant,
@@ -32,62 +34,116 @@ function makeTx(
     mood: extra.mood,
     tags: extra.tags ?? [],
     recurring: extra.recurring ?? false,
-    createdAt: d.getTime(),
+    createdAt: date.getTime(),
   }
 }
 
 export function buildSeedData(): AppData {
   const now = new Date()
-  const salaryDay = 1
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() 
 
-  // income: salary at start of this month
-  const salaryThis = new Date(now.getFullYear(), now.getMonth(), salaryDay)
-  const daysSinceSalary = Math.max(
-    0,
-    Math.round((now.getTime() - salaryThis.getTime()) / 86400000),
-  )
+  const transactions: Transaction[] = []
 
-  const transactions: Transaction[] = [
-    {
+ 
+  const monthlyExpenses = (year: number, month: number): Transaction[] => {
+    const txs: Transaction[] = []
+
+   
+    txs.push({
       id: id(),
       type: "income",
       amount: 16000,
       categoryId: "salary",
       description: "Monthly salary",
-      date: toISODate(salaryThis),
+      date: toISODate(makeDate(year, month, 1)),
       time: "10:00",
       paymentMethod: "bank",
       merchant: "Employer",
       tags: ["salary"],
       recurring: true,
-      createdAt: salaryThis.getTime(),
-    },
-    // this month expenses
-    makeTx(Math.min(daysSinceSalary, 1), 120, "food", "Lunch at campus", { merchant: "Canteen", mood: "necessary", paymentMethod: "cash", time: "13:15" }),
-    makeTx(1, 60, "transport", "Bus to office", { mood: "necessary", paymentMethod: "cash", time: "09:00" }),
-    makeTx(2, 350, "food", "Groceries", { merchant: "Shwapno", mood: "necessary", paymentMethod: "bkash" }),
-    makeTx(2, 200, "internet", "Broadband bill", { merchant: "Link3", mood: "necessary", recurring: true, paymentMethod: "bkash" }),
-    makeTx(3, 800, "gifts", "Flowers for wife", { mood: "happy", paymentMethod: "cash", notes: "Anniversary surprise", tags: ["wife"] }),
-    makeTx(3, 90, "transport", "Rickshaw", { mood: "necessary" }),
-    makeTx(4, 1500, "parents", "Sent to parents", { mood: "necessary", paymentMethod: "bkash", tags: ["family"] }),
-    makeTx(5, 250, "entertainment", "Movie night", { merchant: "Star Cineplex", mood: "luxury", paymentMethod: "card" }),
-    makeTx(5, 180, "food", "Dinner out", { merchant: "Sultan's Dine", mood: "luxury" }),
-    makeTx(6, 500, "shopping", "New shirt", { merchant: "Aarong", mood: "regret", paymentMethod: "card", notes: "Didn't really need this" }),
-    makeTx(7, 300, "university", "Semester supplies", { mood: "necessary" }),
-    makeTx(8, 70, "food", "Tea & snacks", { mood: "happy" }),
-    makeTx(9, 400, "medical", "Medicine", { merchant: "Lazz Pharma", mood: "necessary", paymentMethod: "bkash" }),
-    makeTx(10, 150, "fuel", "Bike fuel", { mood: "necessary" }),
-    makeTx(11, 60, "transport", "Bus", { mood: "necessary" }),
-    makeTx(12, 220, "food", "Groceries", { mood: "necessary", paymentMethod: "bkash" }),
-    makeTx(13, 999, "subscriptions", "Phone recharge + Netflix", { mood: "luxury", recurring: true, paymentMethod: "card" }),
-    // last month (30+ days ago) for comparison
-    makeTx(34, 700, "food", "Groceries", { mood: "necessary" }),
-    makeTx(36, 300, "transport", "Monthly commute", { mood: "necessary" }),
-    makeTx(38, 1200, "parents", "Support", { mood: "necessary" }),
-    makeTx(40, 400, "shopping", "Household", { mood: "necessary" }),
-    makeTx(42, 200, "entertainment", "Outing", { mood: "happy" }),
-    makeTx(44, 250, "internet", "Broadband", { mood: "necessary", recurring: true }),
-  ]
+      createdAt: makeDate(year, month, 1).getTime(),
+    })
+
+    txs.push(makeTxOnDate(makeDate(year, month, 2), 120, "food", "Lunch at campus", { merchant: "Canteen", mood: "necessary", paymentMethod: "cash", time: "13:15" }))
+    txs.push(makeTxOnDate(makeDate(year, month, 5), 350 + (month * 10), "food", "Groceries", { merchant: "Shwapno", mood: "necessary", paymentMethod: "bkash" }))
+    txs.push(makeTxOnDate(makeDate(year, month, 14), 180 + (month * 5), "food", "Dinner out", { merchant: "Sultan's Dine", mood: "luxury" }))
+    txs.push(makeTxOnDate(makeDate(year, month, 20), 80, "food", "Tea & snacks", { mood: "happy", time: "16:00" }))
+
+    
+    txs.push(makeTxOnDate(makeDate(year, month, 3), 60, "transport", "Bus to office", { mood: "necessary", paymentMethod: "cash", time: "09:00" }))
+    txs.push(makeTxOnDate(makeDate(year, month, 10), 150, "fuel", "Bike fuel", { mood: "necessary" }))
+    txs.push(makeTxOnDate(makeDate(year, month, 22), 90, "transport", "Rickshaw", { mood: "necessary" }))
+
+  
+    txs.push(makeTxOnDate(makeDate(year, month, 4), 200, "internet", "Broadband bill", { merchant: "Link3", mood: "necessary", recurring: true, paymentMethod: "bkash" }))
+
+   
+    txs.push(makeTxOnDate(makeDate(year, month, 6), 1500, "parents", "Sent to parents", { mood: "necessary", paymentMethod: "bkash", tags: ["family"] }))
+
+   
+    if (month % 2 === 0) {
+      txs.push(makeTxOnDate(makeDate(year, month, 12), 500 + (month * 20), "shopping", "Clothing purchase", { merchant: "Aarong", mood: "regret", paymentMethod: "card" }))
+    } else {
+      txs.push(makeTxOnDate(makeDate(year, month, 16), 300, "shopping", "Household items", { merchant: "Daraz", mood: "necessary", paymentMethod: "bkash" }))
+    }
+
+  
+    txs.push(makeTxOnDate(makeDate(year, month, 18), 250 + (month * 8), "entertainment", "Movie night", { merchant: "Star Cineplex", mood: "happy", paymentMethod: "card" }))
+
+   
+    txs.push(makeTxOnDate(makeDate(year, month, 7), 999, "subscriptions", "Phone recharge + Netflix", { mood: "luxury", recurring: true, paymentMethod: "card" }))
+
+ 
+    if (month % 3 === 0) {
+      txs.push(makeTxOnDate(makeDate(year, month, 15), 400, "medical", "Medicine", { merchant: "Lazz Pharma", mood: "necessary", paymentMethod: "bkash" }))
+    }
+
+   
+    if (month === 1 || month === 3 || month === 11) {
+      txs.push(makeTxOnDate(makeDate(year, month, 13), 800, "gifts", "Special gift", { mood: "happy", paymentMethod: "card" }))
+    }
+
+    
+    if (month <= 2) {
+      txs.push(makeTxOnDate(makeDate(year, month, 8), 300, "university", "Semester supplies", { mood: "necessary" }))
+    }
+
+    
+    if (month === 2 || month === 5 || month === 8) {
+      txs.push({
+        id: id(),
+        type: "income",
+        amount: 4500,
+        categoryId: "freelance",
+        description: "Freelance project payment",
+        date: toISODate(makeDate(year, month, 25)),
+        time: "14:00",
+        paymentMethod: "bkash",
+        tags: ["freelance"],
+        recurring: false,
+        createdAt: makeDate(year, month, 25).getTime(),
+      })
+    }
+
+    return txs
+  }
+
+  
+  for (let m = 0; m <= currentMonth; m++) {
+    const entries = monthlyExpenses(currentYear, m)
+
+   
+    if (m === currentMonth) {
+      const today = now.getDate()
+      entries.forEach((tx) => {
+        const txDay = new Date(tx.date).getDate()
+        if (txDay <= today) transactions.push(tx)
+      })
+    } else {
+      transactions.push(...entries)
+    }
+  }
 
   const loans: Loan[] = [
     {
@@ -95,8 +151,8 @@ export function buildSeedData(): AppData {
       direction: "borrowed",
       person: "Rakib (friend)",
       amount: 3000,
-      date: toISODate(new Date(now.getFullYear(), now.getMonth(), Math.max(1, now.getDate() - 8))),
-      dueDate: toISODate(new Date(now.getFullYear(), now.getMonth() + 1, 3)),
+      date: toISODate(new Date(currentYear, currentMonth, Math.max(1, now.getDate() - 8))),
+      dueDate: toISODate(new Date(currentYear, currentMonth + 1, 3)),
       reason: "Ran short before payday",
       amountRepaid: 1000,
       notes: "Repay after salary",
@@ -107,8 +163,8 @@ export function buildSeedData(): AppData {
       direction: "borrowed",
       person: "Cousin Tanvir",
       amount: 1500,
-      date: toISODate(new Date(now.getFullYear(), now.getMonth() - 1, 20)),
-      dueDate: toISODate(new Date(now.getFullYear(), now.getMonth(), Math.max(1, now.getDate() - 2))),
+      date: toISODate(new Date(currentYear, currentMonth - 1, 20)),
+      dueDate: toISODate(new Date(currentYear, currentMonth, Math.max(1, now.getDate() - 2))),
       reason: "Medical emergency",
       amountRepaid: 1500,
       notes: "",
@@ -119,8 +175,8 @@ export function buildSeedData(): AppData {
       direction: "lent",
       person: "Sabbir",
       amount: 500,
-      date: toISODate(new Date(now.getFullYear(), now.getMonth(), Math.max(1, now.getDate() - 5))),
-      dueDate: toISODate(new Date(now.getFullYear(), now.getMonth() + 1, 10)),
+      date: toISODate(new Date(currentYear, currentMonth, Math.max(1, now.getDate() - 5))),
+      dueDate: toISODate(new Date(currentYear, currentMonth + 1, 10)),
       reason: "Lunch money",
       amountRepaid: 0,
       notes: "",
@@ -141,7 +197,7 @@ export function buildSeedData(): AppData {
     version: 1,
     settings: {
       salary: 16000,
-      salaryDate: salaryDay,
+      salaryDate: 1,
       currency: "BDT",
       currencySymbol: "৳",
     },

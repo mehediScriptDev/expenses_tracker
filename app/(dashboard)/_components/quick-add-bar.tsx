@@ -4,7 +4,7 @@ import * as React from "react"
 import { useStore } from "@/lib/store"
 import { Icon } from "@/lib/icon"
 import { todayISO, nowTime, formatMoney } from "@/lib/format"
-import type { QuickAddPreset } from "@/types"
+import type { QuickAddPreset, PaymentMethod } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardCard, dashCaption, dashInput, dashMuted } from "@/dashboard/shared"
@@ -24,11 +24,11 @@ export function QuickAddBar() {
     const tokens = text.trim().split(/\s+/)
     let amount = 0
     let categoryId = "other"
-    let paymentMethod: typeof data.transactions[0]["paymentMethod"] = "cash"
+    let paymentMethod: PaymentMethod = "cash"
     let type: "expense" | "income" = "expense"
     const descWords: string[] = []
 
-    const paymentKeywords: Record<string, typeof paymentMethod> = {
+    const paymentKeywords: Record<string, PaymentMethod> = {
       cash: "cash",
       bkash: "bkash",
       nagad: "nagad",

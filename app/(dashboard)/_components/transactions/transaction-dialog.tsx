@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import {
   Select,
@@ -42,11 +41,7 @@ interface FormState {
   date: string
   time: string
   paymentMethod: PaymentMethod
-  merchant: string
-  location: string
-  notes: string
   mood: Mood | "none"
-  tags: string
   recurring: boolean
 }
 
@@ -59,11 +54,7 @@ function emptyForm(): FormState {
     date: todayISO(),
     time: nowTime(),
     paymentMethod: "cash",
-    merchant: "",
-    location: "",
-    notes: "",
     mood: "none",
-    tags: "",
     recurring: false,
   }
 }
@@ -77,11 +68,7 @@ function fromTx(tx: Transaction): FormState {
     date: tx.date,
     time: tx.time,
     paymentMethod: tx.paymentMethod,
-    merchant: tx.merchant ?? "",
-    location: tx.location ?? "",
-    notes: tx.notes ?? "",
     mood: tx.mood ?? "none",
-    tags: tx.tags.join(", "),
     recurring: tx.recurring,
   }
 }
@@ -89,12 +76,10 @@ function fromTx(tx: Transaction): FormState {
 export function TransactionDialog({ open, onOpenChange, editing }: TransactionDialogProps) {
   const { data, addTransaction, updateTransaction } = useStore()
   const [form, setForm] = React.useState<FormState>(emptyForm)
-  const [showMore, setShowMore] = React.useState(false)
 
   React.useEffect(() => {
     if (open) {
       setForm(editing ? fromTx(editing) : emptyForm())
-      setShowMore(Boolean(editing?.notes || editing?.location || editing?.tags.length))
     }
   }, [open, editing])
 
@@ -120,14 +105,8 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
       date: form.date,
       time: form.time,
       paymentMethod: form.paymentMethod,
-      merchant: form.merchant.trim() || undefined,
-      location: form.location.trim() || undefined,
-      notes: form.notes.trim() || undefined,
       mood: form.mood === "none" ? undefined : form.mood,
-      tags: form.tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
+      tags: [],
       recurring: form.recurring,
     }
     if (editing) {
@@ -142,7 +121,7 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md rounded-lg">
         <DialogHeader>
           <DialogTitle>{editing ? "Edit transaction" : "Add transaction"}</DialogTitle>
           <DialogDescription>
@@ -152,7 +131,7 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
 
         <form onSubmit={submit} className="flex flex-col gap-4">
           {/* type toggle */}
-          <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#F2EFE9] p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-lg bg-[#F2EFE9] p-1">
             {(["expense", "income"] as TransactionType[]).map((t) => (
               <button
                 key={t}
@@ -295,61 +274,8 @@ export function TransactionDialog({ open, onOpenChange, editing }: TransactionDi
             </div>
           )}
 
-          {/* more details */}
-          {!showMore ? (
-            <button
-              type="button"
-              onClick={() => setShowMore(true)}
-              className="text-left text-sm font-medium text-[#2B4C7E] hover:underline"
-            >
-              + Add merchant, location, tags & notes
-            </button>
-          ) : (
-            <div className="grid gap-4 rounded-xl bg-[#F2EFE9] p-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="grid gap-1.5">
-                  <Label htmlFor="merchant">Merchant</Label>
-                  <Input
-                    id="merchant"
-                    placeholder="e.g. Shwapno"
-                    value={form.merchant}
-                    onChange={(e) => set("merchant", e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    placeholder="Optional"
-                    value={form.location}
-                    onChange={(e) => set("location", e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="tags">Tags</Label>
-                <Input
-                  id="tags"
-                  placeholder="comma, separated, tags"
-                  value={form.tags}
-                  onChange={(e) => set("tags", e.target.value)}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Anything worth remembering?"
-                  value={form.notes}
-                  onChange={(e) => set("notes", e.target.value)}
-                  rows={2}
-                />
-              </div>
-            </div>
-          )}
-
           {/* recurring */}
-          <label className="flex items-center justify-between rounded-xl bg-[#F2EFE9] px-3 py-2">
+          <label className="flex items-center justify-between rounded-lg bg-[#F2EFE9] px-3 py-2">
             <span className="text-sm">
               <span className="font-medium">Recurring</span>
               <span className="block text-xs text-muted-foreground">
