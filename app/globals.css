@@ -292,6 +292,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.notification-panel-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.notification-panel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes marquee-left {
   0% {
     transform: translateX(0%);

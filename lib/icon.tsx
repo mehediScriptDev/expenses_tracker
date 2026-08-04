@@ -10,10 +10,6 @@ function toPascal(key: string) {
     .join("")
 }
 
-/**
- * Renders a lucide icon from a kebab-case key (e.g. "hand-coins").
- * Falls back to a neutral circle if the key is unknown.
- */
 export function Icon({ name, ...props }: { name: string } & LucideProps) {
   const Comp =
     (Lucide as unknown as Record<string, React.ComponentType<LucideProps>>)[

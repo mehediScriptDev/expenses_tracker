@@ -35,7 +35,6 @@ export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(10)
 
-  // Reset to page 1 when filters change
   React.useEffect(() => {
     setCurrentPage(1)
   }, [search, typeFilter])

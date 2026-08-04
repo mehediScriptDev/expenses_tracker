@@ -8,15 +8,12 @@ import { useAuth } from "@/lib/auth"
 import { Icon } from "@/lib/icon"
 import { cn } from "@/lib/utils"
 import { MAIN_NAV } from "@/config/navigation"
-
-
+import { ModalBackdrop } from "@/components/ui/modal-overlay"
 
 interface MobileSidebarProps {
   open: boolean
   onClose: () => void
 }
-
-
 
 function SidebarBrand({ onClose }: { onClose: () => void }) {
   return (
@@ -108,17 +105,14 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        aria-hidden="true"
-        onClick={onClose}
+      <ModalBackdrop
+        onDismiss={onClose}
         className={cn(
-          "fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+          "z-40 transition-opacity duration-300 lg:hidden",
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
         )}
       />
 
-   
       <aside
         role="dialog"
         aria-modal="true"
@@ -132,7 +126,6 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-       
         <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-200 dark:border-neutral-800">
           <SidebarBrand onClose={onClose} />
           <button
@@ -145,7 +138,6 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           </button>
         </div>
 
-   
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
           {MAIN_NAV.map((item) => (
             <SidebarNavItem
@@ -159,9 +151,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           ))}
         </nav>
 
-    
         <div className="px-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-       
           <div className="mb-3 rounded-xl bg-white dark:bg-muted p-3 space-y-1">
             <p className="text-sm font-bold text-[#1A1A1A] dark:text-foreground">Spend with intention</p>
             <p className="text-sm leading-relaxed text-[#5C5955] dark:text-muted-foreground text-pretty">

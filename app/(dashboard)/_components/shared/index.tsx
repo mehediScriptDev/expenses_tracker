@@ -31,8 +31,6 @@ export {
 
 export { Pagination } from "@/components/ui/pagination"
 
-/* ------------------------- ProgressBar ------------------------- */
-
 export type Tone = "primary" | "accent" | "success" | "warning" | "danger" | "muted"
 
 const toneBar: Record<Tone, string> = {
@@ -72,8 +70,6 @@ export function ProgressBar({
   )
 }
 
-/* ------------------------- EmptyState ------------------------- */
-
 export function EmptyState({
   icon = "sparkles",
   title,
@@ -108,8 +104,6 @@ export function EmptyState({
   )
 }
 
-/* ------------------------- PageHeader ------------------------- */
-
 export function PageHeader({
   title,
   description,
@@ -141,8 +135,6 @@ export function DashPage({
 }) {
   return <div className={cn("dash-page", className)}>{children}</div>
 }
-
-/* ------------------------- CategoryDot ------------------------- */
 
 export function CategoryBadge({
   icon,

@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button"
 import type { Transaction } from "@/types"
 import { MAIN_NAV, MOBILE_NAV } from "@/config/navigation"
 import { MobileSidebar } from "@/dashboard/layout/mobile-sidebar"
+import { NotificationBell } from "@/dashboard/layout/notification-bell"
+import { DashboardScrollReset } from "@/dashboard/layout/dashboard-scroll-reset"
+import { headerActionClass } from "@/dashboard/layout/header-action-button"
 import { BrandSpinner } from "@/app/loading"
 
 interface UIContextValue {
@@ -55,7 +58,8 @@ function UserMenu() {
       <button
         onClick={() => setOpen(!open)}
         aria-label="User Menu"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EBF3FA] font-mono font-bold text-xs text-[#2B4C7E] hover:bg-[#DEEBF7] transition-all cursor-pointer"
+        aria-expanded={open}
+        className={cn(headerActionClass(open), "font-mono font-bold text-xs")}
       >
         <span>AA</span>
       </button>
@@ -128,9 +132,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <UIContext.Provider value={ui}>
+      <DashboardScrollReset />
       <div className="min-h-svh bg-background">
-
-     
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3] dark:bg-sidebar px-3 py-5 lg:flex">
           <div className="px-2 pb-4 border-b border-neutral-200 dark:border-neutral-800">
             <Brand />
@@ -157,7 +160,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* Sidebar footer tip */}
           <div className="mt-auto rounded-xl bg-white dark:bg-muted p-3 space-y-1">
             <p className="text-sm font-bold text-[#1A1A1A] dark:text-foreground">Spend with intention</p>
             <p className="text-sm leading-relaxed text-[#5C5955] dark:text-muted-foreground text-pretty">
@@ -166,12 +168,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-    
         <div className="lg:pl-60">
-          {/* Top header bar */}
-          <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3] dark:bg-background px-4 sm:px-6">
+          <header className="z-20 flex min-h-14 items-center justify-between gap-3 border-b border-neutral-200 dark:border-neutral-800 bg-[#FAF8F3] dark:bg-background px-4 pt-[env(safe-area-inset-top,0px)] sm:px-6 lg:sticky lg:top-0 lg:pt-0">
             <div className="flex items-center gap-2">
-              {/* Hamburger — mobile only */}
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
@@ -191,6 +190,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center gap-2">
+              <NotificationBell />
+              <span className="hidden h-5 w-px bg-neutral-200 dark:bg-neutral-700 sm:block" aria-hidden />
               <UserMenu />
             </div>
           </header>
@@ -200,13 +201,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </main>
         </div>
 
-    
-        
         <nav
           className="fixed inset-x-0 bottom-0 z-30 lg:hidden"
           style={{ background: "var(--color-background, #FAF8F3)" }}
         >
-        
           <div className="border-t border-neutral-200 dark:border-neutral-800" />
 
           <div
@@ -214,7 +212,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0.5rem))" }}
           >
             {MOBILE_NAV.map((item) => {
-              
               if (item.fab) {
                 return (
                   <div key={item.href} className="flex flex-1 items-center justify-center">
@@ -257,7 +254,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        {/* Mobile sidebar drawer */}
         <MobileSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         <TransactionDialog open={dialogOpen} onOpenChange={setDialogOpen} editing={editing} />

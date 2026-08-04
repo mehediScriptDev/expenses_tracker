@@ -193,6 +193,13 @@ export function buildSeedData(): AppData {
     gifts: 1000,
   }
 
+  const demo = applyNotificationDemoScenario(
+    { transactions, loans, budgets },
+    now,
+    currentYear,
+    currentMonth,
+  )
+
   return {
     version: 1,
     settings: {
@@ -202,11 +209,88 @@ export function buildSeedData(): AppData {
       currencySymbol: "৳",
     },
     categories: DEFAULT_CATEGORIES,
-    transactions: transactions.sort((a, b) => b.createdAt - a.createdAt),
-    loans,
-    budgets,
+    transactions: demo.transactions.sort((a, b) => b.createdAt - a.createdAt),
+    loans: demo.loans,
+    budgets: demo.budgets,
     quickAddPresets: DEFAULT_QUICK_ADD_PRESETS.map((p) => ({ ...p })),
   }
+}
+
+function applyNotificationDemoScenario(
+  base: {
+    transactions: Transaction[]
+    loans: Loan[]
+    budgets: Record<string, number>
+  },
+  now: Date,
+  year: number,
+  month: number,
+): { transactions: Transaction[]; loans: Loan[]; budgets: Record<string, number> } {
+  const transactions = [...base.transactions]
+  const loans = base.loans.map((l) => ({ ...l }))
+  const budgets = { ...base.budgets, food: 2800, shopping: 900, entertainment: 600 }
+
+  const today = now.getDate()
+  const day = (offset: number) => Math.max(1, Math.min(28, today + offset))
+
+  transactions.push(
+    makeTxOnDate(makeDate(year, month, day(-1)), 1400, "food", "Demo: big grocery restock", {
+      merchant: "Meena Bazar",
+      paymentMethod: "bkash",
+    }),
+  )
+  transactions.push(
+    makeTxOnDate(makeDate(year, month, day(-2)), 950, "food", "Demo: family dinner", {
+      mood: "happy",
+      paymentMethod: "card",
+    }),
+  )
+  transactions.push(
+    makeTxOnDate(makeDate(year, month, day(-3)), 720, "shopping", "Demo: online order", {
+      merchant: "Daraz",
+      paymentMethod: "bkash",
+    }),
+  )
+
+  for (let i = 0; i < 4; i++) {
+    transactions.push(
+      makeTxOnDate(makeDate(year, month, day(-i)), 380 + i * 40, "entertainment", "Demo: this week spend", {
+        paymentMethod: "cash",
+      }),
+    )
+  }
+  transactions.push(
+    makeTxOnDate(makeDate(year, month, day(-9)), 120, "transport", "Demo: light day last week", {
+      paymentMethod: "cash",
+    }),
+  )
+
+  transactions.push(
+    makeTxOnDate(makeDate(year, month, day(-4)), 1100, "parents", "Demo: extra support", {
+      paymentMethod: "bkash",
+    }),
+  )
+
+  const tanvir = loans.find((l) => l.person.includes("Tanvir"))
+  if (tanvir) {
+    tanvir.amountRepaid = 400
+    tanvir.dueDate = toISODate(makeDate(year, month, day(-6)))
+  }
+
+  loans.push({
+    id: id("loan"),
+    direction: "borrowed",
+    person: "Office friend (demo)",
+    amount: 1200,
+    date: toISODate(makeDate(year, month, day(-5))),
+    dueDate: toISODate(makeDate(year, month + 1, 12)),
+    reason: "Short before weekend",
+    amountRepaid: 0,
+    notes: "Demo notification",
+    createdAt: now.getTime() - 5 * 86400000,
+  })
+
+  return { transactions, loans, budgets }
 }
 
 export function emptyData(): AppData {

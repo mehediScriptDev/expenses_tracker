@@ -17,9 +17,7 @@ export interface Transaction {
   amount: number
   categoryId: string
   description: string
-  /** ISO date string: YYYY-MM-DD */
   date: string
-  /** HH:mm 24h */
   time: string
   paymentMethod: PaymentMethod
   merchant?: string
@@ -36,9 +34,7 @@ export type CategoryKind = "expense" | "income"
 export interface Category {
   id: string
   name: string
-  /** lucide icon key, see lib/icons */
   icon: string
-  /** css color token, e.g. "var(--chart-1)" or a raw oklch */
   color: string
   kind: CategoryKind
   isCustom: boolean
@@ -51,7 +47,6 @@ export interface Loan {
   direction: LoanDirection
   person: string
   amount: number
-  /** ISO date */
   date: string
   dueDate?: string
   reason?: string
@@ -62,7 +57,6 @@ export interface Loan {
 
 export interface Settings {
   salary: number
-  /** day of month salary lands, 1-28 */
   salaryDate: number
   currency: string
   currencySymbol: string
@@ -77,7 +71,6 @@ export interface QuickAddPreset {
   paymentMethod: PaymentMethod
 }
 
-/** category id -> monthly budget amount */
 export type Budgets = Record<string, number>
 
 export interface AppData {
@@ -88,4 +81,40 @@ export interface AppData {
   loans: Loan[]
   budgets: Budgets
   quickAddPresets: QuickAddPreset[]
+}
+
+export type InsightTone = "positive" | "warning" | "danger" | "neutral"
+
+export interface Insight {
+  id: string
+  tone: InsightTone
+  icon: string
+  title: string
+  detail?: string
+  categoryId?: string
+}
+
+export type NotificationType =
+  | "BUDGET_LIMIT_WARNING"
+  | "BUDGET_LIMIT_EXCEEDED"
+  | "GOAL_MILESTONE"
+  | "DEBT_DUE_SOON"
+
+export interface AppNotification {
+  id: string
+  type: NotificationType
+  message: string
+  href: string
+  createdAt: number
+}
+
+export interface Goal {
+  id: string
+  title: string
+  targetAmount: number
+  currentAmount: number
+  targetDate?: string
+  icon: string
+  color: string
+  createdAt: number
 }

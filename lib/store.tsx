@@ -3,6 +3,7 @@
 import * as React from "react"
 import { STORAGE_KEY, DEFAULT_QUICK_ADD_PRESETS } from "./constants"
 import { buildSeedData, emptyData } from "./seed"
+import { clearNotificationReadState } from "./notifications"
 import type {
   AppData,
   Budgets,
@@ -54,34 +55,29 @@ interface DeletedTx {
 interface StoreValue {
   data: AppData
   hydrated: boolean
-  // transactions
   addTransaction: (tx: Omit<Transaction, "id" | "createdAt">) => Transaction
   updateTransaction: (id: string, patch: Partial<Transaction>) => void
   deleteTransaction: (id: string) => void
   duplicateTransaction: (id: string) => void
   undoDelete: () => void
   canUndo: boolean
-  // categories
   addCategory: (cat: Omit<Category, "id" | "isCustom">) => Category
   updateCategory: (id: string, patch: Partial<Category>) => void
   deleteCategory: (id: string) => void
-  // loans
   addLoan: (loan: Omit<Loan, "id" | "createdAt">) => void
   updateLoan: (id: string, patch: Partial<Loan>) => void
   deleteLoan: (id: string) => void
-  // budgets & settings
   setBudget: (categoryId: string, amount: number) => void
   removeBudget: (categoryId: string) => void
   setBudgets: (b: Budgets) => void
   updateSettings: (patch: Partial<Settings>) => void
-  // quick add presets
   addQuickAddPreset: (preset: Omit<QuickAddPreset, "id">) => void
   updateQuickAddPreset: (id: string, patch: Partial<QuickAddPreset>) => void
   deleteQuickAddPreset: (id: string) => void
-  // data mgmt
   replaceAll: (data: AppData) => void
   resetAll: () => void
   loadDemo: () => void
+  resetNotificationInbox: () => void
 }
 
 const StoreContext = React.createContext<StoreValue | null>(null)
@@ -227,7 +223,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         })),
       replaceAll: (next) => setData(normalizeData(next)),
       resetAll: () => setData(emptyData()),
-      loadDemo: () => setData(buildSeedData()),
+      loadDemo: () => {
+        clearNotificationReadState()
+        setData(buildSeedData())
+      },
+      resetNotificationInbox: () => clearNotificationReadState(),
     }
   }, [data, hydrated, canUndo])
 

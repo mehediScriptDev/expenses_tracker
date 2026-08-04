@@ -10,17 +10,7 @@ import {
   quarterRange,
   loanTotals,
 } from "./selectors"
-import type { AppData, Transaction } from "@/types"
-
-export type InsightTone = "positive" | "warning" | "danger" | "neutral"
-
-export interface Insight {
-  id: string
-  tone: InsightTone
-  icon: string
-  title: string
-  detail?: string
-}
+import type { AppData, Insight, Transaction } from "@/types"
 
 function shift(range: { start: Date; end: Date }, ms: number) {
   return { start: new Date(range.start.getTime() - ms), end: new Date(range.end.getTime() - ms) }
@@ -52,6 +42,7 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
         id: "month-change",
         tone: change > 0 ? "warning" : "positive",
         icon: change > 0 ? "trending-up" : "trending-down",
+        categoryId: "shopping",
         title:
           change > 0
             ? `You spent ${Math.round(change)}% more than last month`
@@ -64,7 +55,6 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
     }
   }
 
-  // week vs last week
   const week = weekRange(now)
   const weekSpend = sumExpenses(txInRange(transactions, week))
   const lastWeekSpend = sumExpenses(txInRange(transactions, shift(week, 7 * DAY)))
@@ -75,6 +65,7 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
         id: "week-change",
         tone: change > 0 ? "warning" : "positive",
         icon: "calendar",
+        categoryId: "shopping",
         title:
           change > 0
             ? "You spent more this week than last week"
@@ -84,7 +75,6 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
     }
   }
 
-  // biggest category this month
   const monthExpenses = txInRange(transactions, month).filter((t) => t.type === "expense")
   const byCat = new Map<string, number>()
   for (const t of monthExpenses) byCat.set(t.categoryId, (byCat.get(t.categoryId) ?? 0) + t.amount)
@@ -98,13 +88,13 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
         id: "top-cat",
         tone: "neutral",
         icon: cat.icon,
+        categoryId: topCat,
         title: `${cat.name} was your biggest expense this month`,
         detail: `You spent the most on ${cat.name.toLowerCase()} so far.`,
       })
     }
   }
 
-  // category month-over-month spikes
   for (const [catId, cur] of byCat) {
     const prev = sumExpenses(
       txInRange(transactions, lastMonth).filter((t) => t.categoryId === catId),
@@ -118,6 +108,7 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
             id: `cat-spike-${catId}`,
             tone: "warning",
             icon: "arrow-up-right",
+            categoryId: catId,
             title: `${cat.name} expenses increased by ${Math.round(change)}%`,
             detail: "This category is growing faster than usual.",
           })
@@ -126,7 +117,6 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
     }
   }
 
-  // borrowing frequency this month
   const borrowsThisMonth = data.loans.filter((l) => {
     const d = parseISO(l.date)
     return l.direction === "borrowed" && d >= month.start && d < month.end
@@ -136,6 +126,7 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
       id: "borrow-count",
       tone: borrowsThisMonth >= 3 ? "danger" : "warning",
       icon: "hand-coins",
+      categoryId: "borrowed",
       title: `You borrowed money ${borrowsThisMonth} ${borrowsThisMonth === 1 ? "time" : "times"} this month`,
       detail:
         borrowsThisMonth >= 3
@@ -144,7 +135,6 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
     })
   }
 
-  // savings this quarter vs last
   const savingsCats = (t: Transaction) => t.categoryId === "savings" || t.categoryId === "investment"
   const q = quarterRange(now)
   const lastQ = {
@@ -158,12 +148,12 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
       id: "savings-quarter",
       tone: "positive",
       icon: "piggy-bank",
+      categoryId: "savings",
       title: "Your savings increased this quarter",
       detail: "You are setting aside more than the previous quarter. Keep it up.",
     })
   }
 
-  // spending by day of week (last 60 days)
   const recent = transactions.filter((t) => {
     const d = parseISO(t.date)
     return t.type === "expense" && d.getTime() >= now.getTime() - 60 * DAY
@@ -183,6 +173,7 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
         id: "dow-high",
         tone: "neutral",
         icon: "calendar-clock",
+        categoryId: "other",
         title: `${names[hi]} is usually your highest spending day`,
         detail: `You tend to spend the least on ${names[lo]}.`,
       })
@@ -191,8 +182,6 @@ export function computeInsights(data: AppData, now = new Date()): Insight[] {
 
   return insights
 }
-
-/* --------------------------- warnings --------------------------- */
 
 export function computeWarnings(data: AppData, now = new Date()): Insight[] {
   const warnings: Insight[] = []
@@ -206,7 +195,6 @@ export function computeWarnings(data: AppData, now = new Date()): Insight[] {
   )
   const remaining = settings.salary - cycleSpend
 
-  // spending too fast: elapsed fraction vs spent fraction
   if (cycle.totalDays > 0 && settings.salary > 0) {
     const elapsedFrac = cycle.daysElapsed / cycle.totalDays
     const spentFrac = cycleSpend / settings.salary
@@ -215,18 +203,19 @@ export function computeWarnings(data: AppData, now = new Date()): Insight[] {
         id: "too-fast",
         tone: "danger",
         icon: "gauge",
+        categoryId: "emergency",
         title: "You are spending too fast",
         detail: `You've used ${Math.round(spentFrac * 100)}% of your salary with ${cycle.daysRemaining} days left in this cycle.`,
       })
     }
   }
 
-  // may run out before payday
   if (remaining <= 0 && cycle.daysRemaining > 0) {
     warnings.push({
       id: "out-of-money",
       tone: "danger",
       icon: "triangle-alert",
+      categoryId: "emergency",
       title: "You may run out of money before payday",
       detail: `You have ${cycle.daysRemaining} days left and your salary is already used up.`,
     })
@@ -235,19 +224,20 @@ export function computeWarnings(data: AppData, now = new Date()): Insight[] {
       id: "low-daily",
       tone: "warning",
       icon: "wallet-minimal",
+      categoryId: "salary",
       title: "Slow down to make it to payday",
       detail: `Only about ${Math.round(remaining / cycle.daysRemaining)} per day left for ${cycle.daysRemaining} days.`,
     })
   }
 
-  // budgets over
   const usage = computeBudgetUsage(data, now)
   for (const u of usage) {
     if (u.over) {
       warnings.push({
         id: `budget-over-${u.category.id}`,
         tone: "danger",
-        icon: "circle-alert",
+        icon: u.category.icon,
+        categoryId: u.category.id,
         title: `${u.category.name} is over budget`,
         detail: `You've spent ${Math.round(u.pct)}% of your ${u.category.name.toLowerCase()} budget.`,
       })
@@ -255,14 +245,14 @@ export function computeWarnings(data: AppData, now = new Date()): Insight[] {
       warnings.push({
         id: `budget-near-${u.category.id}`,
         tone: "warning",
-        icon: "circle-alert",
+        icon: u.category.icon,
+        categoryId: u.category.id,
         title: `${u.category.name} budget is almost gone`,
         detail: `${Math.round(u.pct)}% used this month.`,
       })
     }
   }
 
-  // no savings this month
   const month = monthRange(now)
   const savedThisMonth = sumExpenses(
     txInRange(transactions, month).filter(
@@ -274,18 +264,19 @@ export function computeWarnings(data: AppData, now = new Date()): Insight[] {
       id: "no-savings",
       tone: "warning",
       icon: "piggy-bank",
+      categoryId: "savings",
       title: "You haven't saved anything this month",
       detail: "Even a small amount set aside builds the habit.",
     })
   }
 
-  // borrowing increasing
   const loans = loanTotals(data.loans, now)
   if (loans.overdue.length > 0) {
     warnings.push({
       id: "overdue-loans",
       tone: "danger",
       icon: "clock-alert",
+      categoryId: "loan-repayment",
       title: `${loans.overdue.length} loan payment${loans.overdue.length > 1 ? "s are" : " is"} overdue`,
       detail: "Repay overdue borrowings to avoid straining relationships.",
     })

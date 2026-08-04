@@ -33,7 +33,6 @@ export function CommandPalette({
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [open, onOpenChange])
 
-  // Reset query when modal closes
   React.useEffect(() => {
     if (!open) setQuery("")
   }, [open])
@@ -70,7 +69,6 @@ export function CommandPalette({
     },
   ]
 
-  // Filter transactions
   const matchingTx = React.useMemo(() => {
     if (!query.trim()) return []
     const q = query.toLowerCase().trim()
@@ -121,7 +119,6 @@ export function CommandPalette({
         </div>
 
         <div className="max-h-80 overflow-y-auto p-2 space-y-3 text-xs">
-          {/* Action Commands */}
           {matchingActions.length > 0 && (
             <div className="space-y-1">
               <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -142,7 +139,6 @@ export function CommandPalette({
             </div>
           )}
 
-          {/* Navigation Items */}
           {matchingNav.length > 0 && (
             <div className="space-y-1">
               <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -163,7 +159,6 @@ export function CommandPalette({
             </div>
           )}
 
-          {/* Transaction Results */}
           {query.trim() && matchingTx.length > 0 && (
             <div className="space-y-1">
               <p className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">

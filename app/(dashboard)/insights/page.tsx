@@ -27,7 +27,6 @@ export default function InsightsPage() {
 
   const sym = data.settings.currencySymbol
 
-  // ── Year bar data ──────────────────────────────────────────
   const yearBars = React.useMemo(() =>
     MONTH_SHORT.map((label, i) => {
       const range = mRange(year, i)
@@ -42,7 +41,6 @@ export default function InsightsPage() {
 
   const maxExpense = Math.max(...yearBars.map(b => b.expenses), 1)
 
-  // ── Year totals ────────────────────────────────────────────
   const yearTotal = React.useMemo(() => {
     const range = yRange(year)
     const txs   = txInRange(data.transactions, range)
@@ -52,7 +50,6 @@ export default function InsightsPage() {
     }
   }, [data.transactions, year])
 
-  // ── Selected month breakdown ───────────────────────────────
   const selected = React.useMemo(() => {
     const range    = mRange(year, month)
     const txs      = txInRange(data.transactions, range)
@@ -86,7 +83,6 @@ export default function InsightsPage() {
 
   const savings = selected.totalInc - selected.totalExp
 
-  // ── Stat cards for selected month ─────────────────────────
   const stats = [
     {
       label: "Total Spent",
@@ -138,10 +134,8 @@ export default function InsightsPage() {
         description="Understand where your money goes — by month, by year, by category."
       />
 
-      {/* ── Main Unified Card ──────────────────────────────── */}
       <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-card shadow-sm overflow-hidden">
 
-        {/* ── Row 1: Year nav + year totals ─────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 sm:px-7 pt-5 pb-4 border-b border-neutral-100 dark:border-neutral-800">
           <div className="flex items-center gap-2">
             <button
@@ -178,7 +172,6 @@ export default function InsightsPage() {
           </div>
         </div>
 
-        {/* ── Row 2: Month pills ────────────────────────────── */}
         <div className="px-5 sm:px-7 py-3.5 border-b border-neutral-100 dark:border-neutral-800 flex flex-wrap gap-1.5">
           {MONTH_SHORT.map((name, i) => {
             const isFuture = year === today.getFullYear() && i > today.getMonth()
@@ -204,7 +197,6 @@ export default function InsightsPage() {
           })}
         </div>
 
-        {/* ── Row 3: Bar chart ──────────────────────────────── */}
         <div className="px-5 sm:px-7 pt-4 pb-3 border-b border-neutral-100 dark:border-neutral-800">
           <div className="flex items-end gap-1 h-24">
             {yearBars.map((b) => {
@@ -259,7 +251,6 @@ export default function InsightsPage() {
           </div>
         </div>
 
-        {/* ── Row 4: 4 stat cards for selected month ────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-5 sm:px-7 py-4 border-b border-neutral-100 dark:border-neutral-800">
           {stats.map((s) => (
             <div
@@ -290,7 +281,6 @@ export default function InsightsPage() {
           ))}
         </div>
 
-        {/* ── Row 5: Category breakdown ─────────────────────── */}
         <div className="flex items-center justify-between px-5 sm:px-7 py-3.5 bg-neutral-50 dark:bg-neutral-800/40">
           <h3 className="text-sm font-extrabold text-neutral-800 dark:text-neutral-200">
             {MONTH_FULL[month]} {year}
@@ -334,7 +324,7 @@ export default function InsightsPage() {
                   {formatMoney(item.total, { symbol: sym })}
                 </span>
                 <span className={cn(
-                  "shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-black tabular-nums min-w-[3rem] text-center",
+                  "shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-black tabular-nums min-w-12 text-center",
                   item.pct >= 40
                     ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400"
                     : item.pct >= 20
@@ -346,7 +336,6 @@ export default function InsightsPage() {
               </div>
             ))}
 
-            {/* Total row */}
             <div className="flex items-center gap-3 sm:gap-4 px-5 sm:px-7 py-4 border-t-2 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/60">
               <span className="shrink-0 rounded-md bg-neutral-900 dark:bg-neutral-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white dark:text-black">
                 Total
@@ -360,7 +349,7 @@ export default function InsightsPage() {
               <span className="font-mono text-base font-black text-neutral-900 dark:text-neutral-100 tabular-nums shrink-0">
                 {formatMoney(selected.totalExp, { symbol: sym })}
               </span>
-              <span className="shrink-0 rounded-lg bg-neutral-900 dark:bg-neutral-100 px-2 py-0.5 text-[11px] font-black text-white dark:text-black min-w-[3rem] text-center">
+              <span className="shrink-0 rounded-lg bg-neutral-900 dark:bg-neutral-100 px-2 py-0.5 text-[11px] font-black text-white dark:text-black min-w-12 text-center">
                 100%
               </span>
             </div>

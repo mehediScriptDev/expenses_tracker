@@ -63,16 +63,14 @@ function SettingsSection({
 }
 
 export default function SettingsPage() {
-  const { data, updateSettings, replaceAll, resetAll, loadDemo } = useStore()
+  const { data, updateSettings, replaceAll, resetAll, loadDemo, resetNotificationInbox } = useStore()
   const { user } = useAuth()
 
-  // Financial profile state
   const [salary, setSalary] = React.useState<string>(String(data.settings.salary))
   const [salaryDate, setSalaryDate] = React.useState<string>(String(data.settings.salaryDate))
   const [currencySymbol, setCurrencySymbol] = React.useState<string>(data.settings.currencySymbol)
   const [currency, setCurrency] = React.useState<string>(data.settings.currency)
 
-  // Password change state
   const [currentPassword, setCurrentPassword] = React.useState("")
   const [newPassword, setNewPassword] = React.useState("")
   const [confirmPassword, setConfirmPassword] = React.useState("")
@@ -367,12 +365,24 @@ export default function SettingsPage() {
               variant="dash"
               onClick={() => {
                 loadDemo()
-                toast.success("Loaded demo dataset!")
+                toast.success("Demo loaded — check the bell for new alerts")
               }}
               className="gap-1.5"
             >
               <Icon name="sparkles" className="size-4" />
               Load demo data
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                resetNotificationInbox()
+                toast.success("Notifications reset — bell badge refreshed")
+              }}
+              className="gap-1.5"
+            >
+              <Icon name="bell" className="size-4" />
+              Reset notifications
             </Button>
           </div>
 

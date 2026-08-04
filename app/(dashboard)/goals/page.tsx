@@ -30,16 +30,7 @@ import {
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
-export interface Goal {
-  id: string
-  title: string
-  targetAmount: number
-  currentAmount: number
-  targetDate?: string
-  icon: string
-  color: string
-  createdAt: number
-}
+import type { Goal } from "@/types"
 
 const STORAGE_GOALS_KEY = "finbuddy:goals:v1"
 
@@ -292,13 +283,13 @@ export default function GoalsPage() {
             <div className="relative min-w-0 flex-1 sm:max-w-xs">
               <Icon
                 name="search"
-                className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--dash-text-faint)]"
+                className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-(--dash-text-faint)"
               />
               <Input
                 placeholder="Search goals..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className={cn(dashInput, "h-11 border-0 bg-[var(--dash-surface)] pl-10 shadow-none")}
+                className={cn(dashInput, "h-11 border-0 bg-(--dash-surface) pl-10 shadow-none")}
               />
             </div>
 
@@ -399,7 +390,7 @@ export default function GoalsPage() {
                         <Button
                           size="sm"
                           variant="dash"
-                          className="h-11 flex-1 gap-1.5 text-xs font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
+                          className="h-11 flex-1 gap-1.5 text-xs font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:bg-[#FFC700]! hover:text-black! hover:border-[#FFC700]! transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:text-black!"
                           onClick={() => handleOpenDeposit(g)}
                         >
                           <Icon name="plus" className="size-3.5" />
@@ -484,7 +475,7 @@ export default function GoalsPage() {
 
                             {/* Progress Bar & Percentage */}
                             <td className="px-3 py-3.5">
-                              <div className="max-w-[160px] space-y-1">
+                              <div className="max-w-40 space-y-1">
                                 <div className="flex items-center justify-between text-[10px]">
                                   <span className="text-neutral-500 font-semibold">{Math.round(pct)}%</span>
                                   {!isCompleted && (
@@ -516,7 +507,7 @@ export default function GoalsPage() {
                                 <Button
                                   size="xs"
                                   variant="dash"
-                                  className="h-8 gap-1 px-2.5 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:!bg-[#FFC700] hover:!text-black hover:!border-[#FFC700] transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:!text-black"
+                                  className="h-8 gap-1 px-2.5 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-900 text-white border border-transparent hover:bg-[#FFC700]! hover:text-black! hover:border-[#FFC700]! transition-all duration-200 [&_svg]:transition-colors hover:[&_svg]:text-black!"
                                   onClick={() => handleOpenDeposit(g)}
                                   title="Deposit / Save"
                                 >

@@ -1,8 +1,6 @@
 import { parseISO } from "./format"
 import type { AppData, Category, Loan, Transaction } from "@/types"
 
-/* ------------------------------ lookups ------------------------------ */
-
 export function categoryMap(data: AppData): Record<string, Category> {
   return Object.fromEntries(data.categories.map((c) => [c.id, c]))
 }
@@ -11,11 +9,9 @@ export function getCategory(data: AppData, id: string): Category | undefined {
   return data.categories.find((c) => c.id === id)
 }
 
-/* ------------------------------ dates ------------------------------ */
-
 export interface DateRange {
   start: Date
-  end: Date // exclusive
+  end: Date
 }
 
 function startOfDay(d: Date) {
@@ -30,7 +26,7 @@ export function todayRange(now = new Date()): DateRange {
 }
 
 export function weekRange(now = new Date()): DateRange {
-  const day = now.getDay() // 0 Sun..6 Sat
+  const day = now.getDay()
   const mondayOffset = (day + 6) % 7
   const start = startOfDay(now)
   start.setDate(start.getDate() - mondayOffset)
@@ -59,7 +55,6 @@ export function yearRange(now = new Date()): DateRange {
   }
 }
 
-/** Pay cycle from salary date -> next salary date */
 export function payCycle(salaryDate: number, now = new Date()) {
   const day = Math.min(Math.max(salaryDate, 1), 28)
   let start: Date
@@ -88,8 +83,6 @@ export function txInRange(txs: Transaction[], range: DateRange) {
   return txs.filter((t) => inRange(t, range))
 }
 
-/* ------------------------------ sums ------------------------------ */
-
 export function sumExpenses(txs: Transaction[]) {
   return txs
     .filter((t) => t.type === "expense")
@@ -101,8 +94,6 @@ export function sumIncome(txs: Transaction[]) {
     .filter((t) => t.type === "income")
     .reduce((s, t) => s + t.amount, 0)
 }
-
-/* ------------------------------ loans ------------------------------ */
 
 export type LoanStatus = "paid" | "partial" | "unpaid" | "overdue"
 
@@ -143,8 +134,6 @@ export function loanTotals(loans: Loan[], now = new Date()) {
     repaymentPct: borrowedTotal > 0 ? (borrowedRepaid / borrowedTotal) * 100 : 100,
   }
 }
-
-/* ------------------------------ dashboard ------------------------------ */
 
 export interface DashboardMetrics {
   currentBalance: number
@@ -242,8 +231,6 @@ export function computeDashboard(data: AppData, now = new Date()): DashboardMetr
     cycleBudget,
   }
 }
-
-/* ------------------------------ budgets ------------------------------ */
 
 export interface BudgetUsage {
   category: Category
