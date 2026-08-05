@@ -20,11 +20,7 @@ export interface Transaction {
   date: string
   time: string
   paymentMethod: PaymentMethod
-  merchant?: string
-  location?: string
-  notes?: string
   mood?: Mood
-  tags: string[]
   recurring: boolean
   createdAt: number
 }
